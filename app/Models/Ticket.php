@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'attendee_id',
     'ticket_number',
     'qr_token_hash',
+    'qr_token',
     'status',
     'checked_in_at',
     'checked_in_by',
@@ -28,6 +29,7 @@ class Ticket extends Model
     {
         return [
             'status' => TicketStatus::class,
+            'qr_token' => 'encrypted',
             'checked_in_at' => 'datetime',
         ];
     }

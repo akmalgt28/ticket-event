@@ -55,7 +55,7 @@ const showingNavigationDropdown = ref(false);
                                     :active="route().current('organizer.participants.*')"
                                 >
                                     Peserta
-                                </NavLink>                            </div>
+                                </NavLink>`r`n                                <NavLink`r`n                                    :href="route('organizer.check-ins.index')"`r`n                                    :active="route().current('organizer.check-ins.*')"`r`n                                >`r`n                                    Check-in`r`n                                </NavLink>                            </div>
 
                         </div>
 

@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Mail\EticketMail;
 use App\Models\Attendee;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class OrganizerOrderEndpointTest extends TestCase
@@ -119,5 +122,36 @@ class OrganizerOrderEndpointTest extends TestCase
         $response = $this->actingAs($admin)->get('/organizer/participants');
 
         $response->assertOk()->assertInertia(fn ($page) => $page->component('Organizer/Participants'));
+    }
+
+    public function test_admin_can_resend_eticket_for_paid_order(): void
+    {
+        $this->seed();
+        Mail::fake();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $order = Order::factory()->create(['order_status' => 'paid', 'payment_status' => 'paid']);
+        Ticket::factory()->for($order)->create(['qr_token' => 'resend-token']);
+
+        $this->actingAs($admin)
+            ->post(route('organizer.orders.resend-eticket', $order))
+            ->assertRedirect();
+
+        Mail::assertQueued(EticketMail::class, function (EticketMail $mail) use ($order): bool {
+            return $mail->orderNumber === $order->order_number;
+        });
+    }
+
+    public function test_staff_cannot_resend_eticket(): void
+    {
+        $this->seed();
+        $staff = User::factory()->create();
+        $staff->assignRole('staff');
+        $order = Order::factory()->create(['order_status' => 'paid', 'payment_status' => 'paid']);
+        Ticket::factory()->for($order)->create(['qr_token' => 'resend-token']);
+
+        $this->actingAs($staff)
+            ->post(route('organizer.orders.resend-eticket', $order))
+            ->assertForbidden();
     }
 }

@@ -22,13 +22,12 @@ class EticketMail extends Mailable implements ShouldQueue
         public string $orderNumber,
         public string $eventTitle,
         Collection $tickets,
-        array $qrTokens,
     ) {
-        $this->ticketData = $tickets->map(function ($ticket) use ($qrTokens): array {
+        $this->ticketData = $tickets->map(function ($ticket): array {
             return [
                 'ticket_number' => $ticket->ticket_number,
                 'attendee_name' => $ticket->attendee?->name ?? 'Peserta',
-                'qr_svg' => QrCode::format('svg')->size(220)->margin(1)->generate($qrTokens[$ticket->id]),
+                'qr_svg' => QrCode::format('svg')->size(220)->margin(1)->generate($ticket->qr_token),
             ];
         })->values()->all();
     }

@@ -48,6 +48,7 @@ class TicketIssuanceService
                         'attendee_id' => $attendee?->id,
                         'ticket_number' => 'TKT-'.strtoupper(str_replace('-', '', (string) Str::uuid())),
                         'qr_token_hash' => hash('sha256', $token),
+                        'qr_token' => $token,
                         'status' => TicketStatus::Issued,
                     ]);
 

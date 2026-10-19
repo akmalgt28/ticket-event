@@ -68,4 +68,24 @@ class TicketCheckInTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors('token');
     }
+
+    public function test_staff_can_open_check_in_page(): void
+    {
+        $this->seed();
+        $staff = User::factory()->create();
+        $staff->assignRole('staff');
+
+        $this->actingAs($staff)
+            ->get('/check-in')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->component('Staff/CheckIn'));
+    }
+
+    public function test_non_staff_cannot_open_check_in_page(): void
+    {
+        $this->seed();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/check-in')->assertForbidden();
+    }
 }

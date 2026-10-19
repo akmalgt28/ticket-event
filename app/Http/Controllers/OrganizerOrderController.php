@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Resources\OrderResource;
+use App\Mail\EticketMail;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -20,6 +25,7 @@ class OrganizerOrderController extends Controller
 
         $orders = Order::query()
             ->with('event:id,title')
+            ->withCount('tickets')
             ->when(! $request->expectsJson(), fn ($query) => $query->with('payments:id,order_id,status,amount,paid_at'))
             ->when($request->filled('status'), function ($query) use ($request): void {
                 $status = OrderStatus::tryFrom((string) $request->query('status'));
@@ -63,6 +69,7 @@ class OrganizerOrderController extends Controller
                 'total_amount' => (string) $order->total_amount,
                 'order_status' => $order->order_status?->value,
                 'payment_status' => $order->payment_status?->value,
+                'tickets_count' => $order->tickets_count,
                 'event' => $order->event?->title,
                 'payment' => $order->payments->first() ? [
                     'status' => $order->payments->first()->status?->value,
@@ -88,5 +95,44 @@ class OrganizerOrderController extends Controller
             'payments',
             'tickets',
         ])))->response();
+    }
+
+    public function resendEticket(Order $order): RedirectResponse
+    {
+        Gate::authorize('view', $order);
+
+        if ($order->order_status !== OrderStatus::Paid) {
+            throw ValidationException::withMessages([
+                'order' => 'E-ticket hanya dapat dikirim untuk order paid.',
+            ]);
+        }
+
+        $order->load(['event', 'tickets.attendee']);
+
+        if ($order->tickets->isEmpty()) {
+            throw ValidationException::withMessages([
+                'order' => 'Order belum memiliki ticket.',
+            ]);
+        }
+
+        foreach ($order->tickets as $ticket) {
+            if (! $ticket->qr_token) {
+                $token = Str::random(64);
+                $ticket->update([
+                    'qr_token_hash' => hash('sha256', $token),
+                    'qr_token' => $token,
+                ]);
+            }
+        }
+
+        Mail::to($order->customer_email)->queue(
+            (new EticketMail(
+                $order->order_number,
+                $order->event->title,
+                $order->tickets,
+            ))->afterCommit(),
+        );
+
+        return back()->with('success', "E-ticket order {$order->order_number} masuk antrean pengiriman.");
     }
 }

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\CheckInController;
 use App\Http\Controllers\Api\PaymentVerificationController;
+use App\Http\Controllers\CheckInPageController;
+use App\Http\Controllers\OrganizerCheckInController;
 use App\Http\Controllers\OrganizerDashboardController;
 use App\Http\Controllers\OrganizerEventController;
 use App\Http\Controllers\OrganizerOrderController;
@@ -29,12 +31,14 @@ Route::get('/order-status', PublicOrderStatusPageController::class)->name('publi
 Route::get('/events/{event:slug}/checkout', [PublicEventPageController::class, 'checkout'])->name('public.events.checkout');
 Route::get('/events/{event:slug}', [PublicEventPageController::class, 'show'])->name('public.events.show');
 
-Route::middleware(['auth', 'verified'])->post('/payments/verify', [PaymentVerificationController::class, 'store'])->name('payments.verify');
+Route::middleware(['auth', 'verified', 'throttle:30,1'])->post('/payments/verify', [PaymentVerificationController::class, 'store'])->name('payments.verify');
 Route::middleware(['auth', 'verified'])->prefix('organizer')->name('organizer.')->group(function () {
     Route::get('/orders', [OrganizerOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrganizerOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/resend-eticket', [OrganizerOrderController::class, 'resendEticket'])->name('orders.resend-eticket');
     Route::get('/participants/export', [OrganizerParticipantController::class, 'export'])->name('participants.export');
     Route::get('/participants', [OrganizerParticipantController::class, 'index'])->name('participants.index');
+    Route::get('/check-ins', [OrganizerCheckInController::class, 'index'])->name('check-ins.index');
 });
 Route::middleware(['auth', 'verified'])->prefix('organizer/events')->name('organizer.events.')->group(function () {
     Route::get('/', [OrganizerEventController::class, 'index'])->name('index');
@@ -47,7 +51,8 @@ Route::middleware(['auth', 'verified'])->prefix('organizer/events')->name('organ
     Route::post('/{event}/publish', [OrganizerEventController::class, 'publish'])->name('publish');
     Route::post('/{event}/close', [OrganizerEventController::class, 'close'])->name('close');
 });
-Route::middleware(['auth', 'verified'])->post('/check-in', [CheckInController::class, 'store'])->name('check-in.store');
+Route::middleware(['auth', 'verified', 'can:checkin.manage'])->get('/check-in', CheckInPageController::class)->name('check-in.index');
+Route::middleware(['auth', 'verified', 'can:checkin.manage', 'throttle:30,1'])->post('/check-in', [CheckInController::class, 'store'])->name('check-in.store');
 Route::middleware(['auth', 'verified'])->prefix('organizer/events/{event}/ticket-types')->name('organizer.ticket-types.')->group(function () {
     Route::get('/', [OrganizerTicketTypeController::class, 'index'])->name('index');
     Route::post('/', [OrganizerTicketTypeController::class, 'store'])->name('store');

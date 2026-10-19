@@ -13,6 +13,8 @@ const filterForm = useForm({
     payment_status: props.filters.payment_status,
 });
 
+const resendForm = useForm({});
+
 const verificationForm = useForm({
     order_id: null,
     status: 'paid',
@@ -36,6 +38,10 @@ const statusLabel = (status) => ({
 
 function search() {
     filterForm.get(route('organizer.orders.index'), { preserveState: true, replace: true });
+}
+
+function resendEticket(orderId) {
+    resendForm.post(route('organizer.orders.resend-eticket', orderId), { preserveScroll: true });
 }
 
 function verifyPayment(orderId) {
@@ -102,6 +108,7 @@ function verifyPayment(orderId) {
                                     <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ statusLabel(order.payment_status) }}</span></td>
                                     <td class="whitespace-nowrap px-5 py-4">
                                         <button v-if="order.payment_status === 'pending' && order.payment" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700" :disabled="verificationForm.processing" @click="verifyPayment(order.id)">Verifikasi paid</button>
+                                        <button v-else-if="order.payment_status === 'paid' && order.tickets_count > 0" type="button" class="rounded-xl bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700" :disabled="resendForm.processing" @click="resendEticket(order.id)">{{ resendForm.processing ? 'Mengirim...' : 'Kirim ulang e-ticket' }}</button>
                                         <span v-else class="text-xs text-slate-400">Tidak ada aksi</span>
                                     </td>
                                 </tr>

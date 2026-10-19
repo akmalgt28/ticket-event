@@ -115,7 +115,6 @@ class PaymentService
                         $lockedOrder->order_number,
                         $lockedOrder->event->title,
                         $issued['tickets'],
-                        $issued['qr_tokens'],
                     ))->afterCommit(),
                 );
             }
