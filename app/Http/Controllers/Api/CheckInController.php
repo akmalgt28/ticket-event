@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\CheckInRequest;
+use App\Http\Resources\TicketResource;
+use App\Services\CheckInService;
+use Illuminate\Http\JsonResponse;
+
+class CheckInController extends Controller
+{
+    public function store(CheckInRequest $request, CheckInService $checkIn): JsonResponse
+    {
+        $ticket = $checkIn->checkIn($request->string('token')->toString(), $request->user());
+
+        return (new TicketResource($ticket))->response();
+    }
+}
