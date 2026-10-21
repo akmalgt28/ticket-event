@@ -8,10 +8,15 @@ const statusLabel = (status) => ({ draft: 'Draft', published: 'Published', close
 const formatDate = (value) => value ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeZone: 'Asia/Jakarta' }).format(new Date(value)) : '-';
 
 function changeStatus(event, action) {
+    const actionLabel = action === 'publish' ? 'publish event ini' : 'menutup event ini';
+
+    if (! window.confirm(`Apakah kamu yakin ingin ${actionLabel}?`)) {
+        return;
+    }
+
     actionForm.event_id = event.id;
     actionForm.post(route(`organizer.events.${action}`, event.id), { preserveScroll: true });
-}
-</script>
+}</script>
 
 <template>
     <Head title="Event Organizer" />
@@ -24,16 +29,16 @@ function changeStatus(event, action) {
         </template>
         <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl">
-                <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+                <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white">
                     <div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-100 text-left text-sm">
                         <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-4 font-bold">Event</th><th class="px-5 py-4 font-bold">Waktu</th><th class="px-5 py-4 font-bold">Lokasi</th><th class="px-5 py-4 font-bold">Status</th><th class="px-5 py-4 font-bold">Aksi</th></tr></thead>
                         <tbody class="divide-y divide-slate-100">
                             <tr v-for="event in events.data" :key="event.id" class="transition hover:bg-amber-50/40">
-                                <td class="px-5 py-4"><p class="font-black text-slate-900">{{ event.title }}</p><p class="text-xs text-slate-500">{{ event.slug }}</p></td>
+                                <td class="px-5 py-4"><Link :href="route('organizer.events.edit', event.id)" class="font-black text-slate-900 underline decoration-amber-400 decoration-2 underline-offset-4 hover:text-amber-700">{{ event.title }}</Link><p class="text-xs text-slate-500">{{ event.slug }}</p></td>
                                 <td class="whitespace-nowrap px-5 py-4 text-slate-600">{{ formatDate(event.start_at) }} - {{ formatDate(event.end_at) }}</td>
                                 <td class="px-5 py-4 text-slate-600">{{ event.location_name || '-' }}</td>
                                 <td class="px-5 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ statusLabel(event.status) }}</span></td>
-                                <td class="whitespace-nowrap px-5 py-4"><Link :href="route('organizer.ticket-types.index', event.id)" class="mr-3 text-xs font-bold text-slate-900 underline decoration-amber-400 decoration-2 underline-offset-4">Ticket</Link><button v-if="event.status === 'draft'" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700" :disabled="actionForm.processing" @click="changeStatus(event, 'publish')">Publish</button><button v-else-if="event.status === 'published'" type="button" class="rounded-xl bg-rose-600 px-3 py-2 text-xs font-bold text-white hover:bg-rose-700" :disabled="actionForm.processing" @click="changeStatus(event, 'close')">Tutup event</button><span v-else class="text-xs text-slate-400">Tidak ada aksi</span></td>
+                                <td class="whitespace-nowrap px-5 py-4"><Link :href="route('organizer.ticket-types.index', event.id)" class="mr-3 text-xs font-bold text-slate-900 underline decoration-amber-400 decoration-2 underline-offset-4">Ticket</Link><Link v-if="event.status === 'published'" :href="route('public.events.show', event.slug)" target="_blank" class="mr-3 text-xs font-bold text-amber-700 underline decoration-amber-400 decoration-2 underline-offset-4">Lihat event</Link><button v-if="event.status === 'draft'" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700" :disabled="actionForm.processing" @click="changeStatus(event, 'publish')">Publish</button><button v-else-if="event.status === 'published'" type="button" class="rounded-xl bg-rose-600 px-3 py-2 text-xs font-bold text-white hover:bg-rose-700" :disabled="actionForm.processing" @click="changeStatus(event, 'close')">Tutup event</button><span v-else class="text-xs text-slate-400">Tidak ada aksi</span></td>
                             </tr>
                             <tr v-if="!events.data.length"><td colspan="5" class="px-5 py-12 text-center text-slate-500">Belum ada event.</td></tr>
                         </tbody>
@@ -44,5 +49,7 @@ function changeStatus(event, action) {
         </div>
     </AuthenticatedLayout>
 </template>
+
+
 
 

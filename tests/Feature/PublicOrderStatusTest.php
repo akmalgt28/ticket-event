@@ -48,4 +48,18 @@ class PublicOrderStatusTest extends TestCase
     {
         $this->get('/order-status')->assertOk();
     }
+
+    public function test_order_status_lookup_is_rate_limited(): void
+    {
+        $payload = [
+            'order_number' => 'ORD-MISSING',
+            'customer_email' => 'missing@example.com',
+        ];
+
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $this->postJson('/api/orders/status', $payload)->assertNotFound();
+        }
+
+        $this->postJson('/api/orders/status', $payload)->assertTooManyRequests();
+    }
 }

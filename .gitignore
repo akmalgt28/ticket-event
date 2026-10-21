@@ -37,3 +37,5 @@ CLAUDE.md
 opencode.json
 boost.json
 *.md
+
+/storage/app/backups/

@@ -1,3 +1,60 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --brand-primary: #d95d39;
+    --brand-primary-dark: #b74327;
+    --brand-ink: #172033;
+    --brand-paper: #f7f4ee;
+    --brand-muted: #667085;
+    --ui-radius: 6px;
+}
+
+html, body {
+    background: var(--brand-paper);
+}
+
+body {
+    margin: 0;
+    color: var(--brand-ink);
+    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+}
+
+*, *::before, *::after {
+    box-shadow: none !important;
+}
+
+[class*='rounded-'] {
+    border-radius: var(--ui-radius) !important;
+}
+
+[class~='rounded-full'] {
+    border-radius: 9999px !important;
+}
+
+[class~='bg-amber-400'], [class~='bg-amber-500'], [class~='bg-amber-600'], [class~='bg-amber-700'] {
+    background-color: var(--brand-primary) !important;
+}
+
+[class~='text-amber-300'], [class~='text-amber-400'], [class~='text-amber-500'], [class~='text-amber-600'], [class~='text-amber-700'] {
+    color: var(--brand-primary) !important;
+}
+
+[class~='hover:bg-amber-400']:hover, [class~='hover:bg-amber-500']:hover, [class~='hover:bg-amber-600']:hover, [class~='hover:bg-amber-700']:hover {
+    background-color: var(--brand-primary-dark) !important;
+}
+
+.brand-bg { background-color: var(--brand-primary); }
+.brand-bg-dark { background-color: var(--brand-ink); }
+.brand-text { color: var(--brand-primary); }
+.brand-border { border-color: color-mix(in srgb, var(--brand-primary) 35%, transparent); }
+.brand-focus:focus { border-color: var(--brand-primary); outline: 2px solid color-mix(in srgb, var(--brand-primary) 25%, transparent); outline-offset: 1px; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\EmailDelivery;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,10 +11,15 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Throwable;
 
 class EticketMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public int $tries = 3;
+
+    public array $backoff = [60, 300, 900];
 
     /** @var array<int, array{ticket_number: string, attendee_name: string, qr_svg: string}> */
     public array $ticketData;
@@ -22,6 +28,7 @@ class EticketMail extends Mailable implements ShouldQueue
         public string $orderNumber,
         public string $eventTitle,
         Collection $tickets,
+        public int $deliveryId,
     ) {
         $this->ticketData = $tickets->map(function ($ticket): array {
             return [
@@ -36,6 +43,12 @@ class EticketMail extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: "E-ticket order {$this->orderNumber}",
+            using: function ($message): void {
+                $message->getHeaders()->addTextHeader(
+                    'X-Ticket-Event-Delivery',
+                    (string) $this->deliveryId,
+                );
+            },
         );
     }
 
@@ -49,5 +62,14 @@ class EticketMail extends Mailable implements ShouldQueue
     public function attachments(): array
     {
         return [];
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        EmailDelivery::query()->whereKey($this->deliveryId)->update([
+            'status' => 'failed',
+            'last_error' => $exception->getMessage(),
+            'failed_at' => now(),
+        ]);
     }
 }

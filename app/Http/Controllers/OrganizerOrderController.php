@@ -125,11 +125,19 @@ class OrganizerOrderController extends Controller
             }
         }
 
+        $delivery = $order->emailDeliveries()->create([
+            'recipient' => $order->customer_email,
+            'type' => 'eticket',
+            'status' => 'queued',
+            'queued_at' => now(),
+        ]);
+
         Mail::to($order->customer_email)->queue(
             (new EticketMail(
                 $order->order_number,
                 $order->event->title,
                 $order->tickets,
+                $delivery->id,
             ))->afterCommit(),
         );
 

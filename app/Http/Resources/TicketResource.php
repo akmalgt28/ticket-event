@@ -18,6 +18,12 @@ class TicketResource extends JsonResource
             'status' => $this->status?->value,
             'checked_in_at' => $this->checked_in_at?->toISOString(),
             'checked_in_by' => $this->checked_in_by,
+            'attendee' => $this->whenLoaded('attendee', fn (): array => [
+                'name' => $this->attendee->name,
+            ]),
+            'event' => $this->when($this->relationLoaded('order') && $this->order->relationLoaded('event'), fn (): array => [
+                'title' => $this->order->event->title,
+            ]),
         ];
     }
 }

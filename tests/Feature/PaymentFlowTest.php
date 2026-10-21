@@ -70,6 +70,12 @@ class PaymentFlowTest extends TestCase
         Mail::assertQueued(EticketMail::class, function (EticketMail $mail) use ($order): bool {
             return $mail->orderNumber === $order->order_number;
         });
+        $this->assertDatabaseHas('email_deliveries', [
+            'order_id' => $order->id,
+            'recipient' => $order->customer_email,
+            'type' => 'eticket',
+            'status' => 'queued',
+        ]);
     }
 
     public function test_staff_cannot_verify_manual_payment(): void
@@ -106,5 +112,18 @@ class PaymentFlowTest extends TestCase
 
         $this->assertSame(1, Ticket::query()->where('order_id', $order->id)->count());
         $this->assertSame(1, AuditLog::query()->where('action', 'payment.manual_verified')->count());
+    }
+
+    public function test_manual_payment_selection_is_rate_limited(): void
+    {
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $this->postJson('/api/orders/999999/payments/manual', [
+                'method' => 'bank_transfer',
+            ])->assertNotFound();
+        }
+
+        $this->postJson('/api/orders/999999/payments/manual', [
+            'method' => 'bank_transfer',
+        ])->assertTooManyRequests();
     }
 }

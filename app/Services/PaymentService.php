@@ -110,11 +110,19 @@ class PaymentService
                 $lockedOrder->load('event');
                 $issued['tickets']->each(fn ($ticket) => $ticket->load('attendee'));
 
+                $delivery = $lockedOrder->emailDeliveries()->create([
+                    'recipient' => $lockedOrder->customer_email,
+                    'type' => 'eticket',
+                    'status' => 'queued',
+                    'queued_at' => now(),
+                ]);
+
                 Mail::to($lockedOrder->customer_email)->queue(
                     (new EticketMail(
                         $lockedOrder->order_number,
                         $lockedOrder->event->title,
                         $issued['tickets'],
+                        $delivery->id,
                     ))->afterCommit(),
                 );
             }

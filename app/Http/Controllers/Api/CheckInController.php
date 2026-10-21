@@ -12,7 +12,7 @@ class CheckInController extends Controller
 {
     public function store(CheckInRequest $request, CheckInService $checkIn): JsonResponse
     {
-        $ticket = $checkIn->checkIn($request->string('token')->toString(), $request->user());
+        $ticket = $checkIn->checkIn($request->input('token'), $request->user(), $request->input('ticket_number'));
 
         return (new TicketResource($ticket))->response();
     }

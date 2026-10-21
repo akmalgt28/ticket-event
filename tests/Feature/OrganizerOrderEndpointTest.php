@@ -102,6 +102,17 @@ class OrganizerOrderEndpointTest extends TestCase
             ->assertJsonPath('data.0.order.order_number', 'ORD-PARTICIPANT');
     }
 
+    public function test_admin_payment_page_redirects_to_pending_orders(): void
+    {
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)
+            ->get(route('organizer.payments.index'))
+            ->assertRedirect(route('organizer.orders.index', ['payment_status' => 'pending']));
+    }
+
     public function test_admin_can_open_orders_inertia_page(): void
     {
         $this->seed();
@@ -140,6 +151,12 @@ class OrganizerOrderEndpointTest extends TestCase
         Mail::assertQueued(EticketMail::class, function (EticketMail $mail) use ($order): bool {
             return $mail->orderNumber === $order->order_number;
         });
+        $this->assertDatabaseHas('email_deliveries', [
+            'order_id' => $order->id,
+            'recipient' => $order->customer_email,
+            'type' => 'eticket',
+            'status' => 'queued',
+        ]);
     }
 
     public function test_staff_cannot_resend_eticket(): void

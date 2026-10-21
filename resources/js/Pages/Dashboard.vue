@@ -42,9 +42,9 @@ const formatDate = (value) => new Intl.DateTimeFormat('id-ID', {
 
         <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl space-y-8">
-                <section class="relative overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-8 text-white shadow-xl shadow-slate-900/10 sm:px-10">
-                    <div class="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-amber-400/20 blur-3xl" />
-                    <div class="relative max-w-2xl">
+                <section class="border-l-4 border-[var(--brand-primary)] bg-slate-950 px-6 py-8 text-white sm:px-10">
+
+                    <div class="max-w-2xl">
                         <p class="text-sm font-semibold text-amber-300">Pendapatan terkonfirmasi</p>
                         <p class="mt-3 text-4xl font-black tracking-tight sm:text-5xl">{{ formatCurrency(metrics.revenue) }}</p>
                         <p class="mt-3 text-sm text-slate-300">Berdasarkan order dengan status pembayaran paid.</p>
@@ -52,7 +52,7 @@ const formatDate = (value) => new Intl.DateTimeFormat('id-ID', {
                 </section>
 
                 <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <article v-for="card in cards" :key="card.label" class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+                    <article v-for="card in cards" :key="card.label" class="border border-slate-200 bg-white p-5 transition hover:border-[var(--brand-primary)]">
                         <div class="flex items-center justify-between">
                             <p class="text-sm font-semibold text-slate-500">{{ card.label }}</p>
                             <span :class="['h-3 w-3 rounded-full', card.dot]" />
@@ -61,7 +61,7 @@ const formatDate = (value) => new Intl.DateTimeFormat('id-ID', {
                     </article>
                 </section>
 
-                <section class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+                <section class="border border-slate-200/80 bg-white p-6">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p class="text-xs font-bold uppercase tracking-[0.24em] text-amber-600">Event aktif</p>
@@ -79,7 +79,7 @@ const formatDate = (value) => new Intl.DateTimeFormat('id-ID', {
                             <p class="text-sm font-semibold text-slate-600">{{ formatDate(event.start_at) }}</p>
                         </div>
                     </div>
-                    <p v-else class="mt-6 rounded-2xl bg-slate-50 p-5 text-sm text-slate-500">Belum ada event published.</p>
+                    <p v-else class="mt-6 border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-500">Belum ada event published.</p>
                 </section>
             </div>
         </div>

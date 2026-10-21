@@ -7,6 +7,7 @@ use App\Models\Attendee;
 use App\Models\Event;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Ticket;
 use App\Models\TicketType;
 use App\Models\User;
 use App\Services\TicketIssuanceService;
@@ -44,7 +45,11 @@ class TicketCheckInTest extends TestCase
 
         $response = $this->actingAs($staff)->postJson('/check-in', ['token' => $token]);
 
-        $response->assertOk()->assertJsonPath('data.status', 'used')->assertJsonMissingPath('data.qr_token_hash');
+        $response->assertOk()
+            ->assertJsonPath('data.status', 'used')
+            ->assertJsonPath('data.attendee.name', $attendee->name)
+            ->assertJsonPath('data.event.title', $event->title)
+            ->assertJsonMissingPath('data.qr_token_hash');
         $this->assertDatabaseHas('tickets', [
             'id' => $ticket->id,
             'status' => 'used',
@@ -55,6 +60,38 @@ class TicketCheckInTest extends TestCase
             ->postJson('/check-in', ['token' => $token])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('token');
+    }
+
+    public function test_ticket_from_expired_order_cannot_be_checked_in(): void
+    {
+        $this->seed();
+        $staff = User::factory()->create();
+        $staff->assignRole('staff');
+        $order = Order::factory()->create(['order_status' => OrderStatus::Expired]);
+        $token = 'expired-ticket-token';
+        Ticket::factory()->for($order)->create([
+            'qr_token_hash' => hash('sha256', $token),
+            'status' => 'issued',
+        ]);
+
+        $this->actingAs($staff)
+            ->postJson('/check-in', ['token' => $token])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('token');
+    }
+
+    public function test_staff_can_check_in_using_ticket_number_fallback(): void
+    {
+        $this->seed();
+        $staff = User::factory()->create();
+        $staff->assignRole('staff');
+        $ticket = Ticket::factory()->for(Order::factory()->create(['order_status' => OrderStatus::Paid]))->create(['ticket_number' => 'TKT-MANUAL-001']);
+
+        $this->actingAs($staff)
+            ->postJson('/check-in', ['ticket_number' => $ticket->ticket_number])
+            ->assertOk()
+            ->assertJsonPath('data.ticket_number', 'TKT-MANUAL-001')
+            ->assertJsonPath('data.status', 'used');
     }
 
     public function test_unknown_ticket_token_is_rejected(): void

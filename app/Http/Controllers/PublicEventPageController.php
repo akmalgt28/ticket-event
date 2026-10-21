@@ -5,16 +5,26 @@ namespace App\Http\Controllers;
 use App\Enums\EventStatus;
 use App\Enums\TicketTypeStatus;
 use App\Models\Event;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PublicEventPageController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $events = Event::query()
             ->where('status', EventStatus::Published)
+            ->when($request->filled('search'), function ($query) use ($request): void {
+                $search = trim((string) $request->query('search'));
+
+                $query->where(function ($query) use ($search): void {
+                    $query->where('title', 'like', "%{$search}%")
+                        ->orWhere('location_name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
             ->with(['ticketTypes' => fn ($query) => $query->where('status', TicketTypeStatus::Active)->availableForSale()->orderBy('price')])
             ->orderBy('start_at')
             ->paginate(12)
@@ -22,6 +32,7 @@ class PublicEventPageController extends Controller
 
         return Inertia::render('Public/Events', [
             'events' => $events->through(fn (Event $event): array => $this->eventData($event)),
+            'filters' => ['search' => (string) $request->query('search', '')],
         ]);
     }
 

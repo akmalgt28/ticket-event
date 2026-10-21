@@ -30,14 +30,14 @@ function search() {
 
         <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl space-y-6">
-                <section class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <section class="rounded-3xl border border-slate-200/80 bg-white p-5">
                     <form class="flex flex-col gap-3 sm:flex-row" @submit.prevent="search">
-                        <input v-model="filterForm.search" type="search" placeholder="Cari nama, email, nomor order..." class="min-w-0 flex-1 rounded-2xl border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-amber-400 focus:ring-amber-400" />
+                        <input v-model="filterForm.search" type="search" placeholder="Cari nama, email, nomor order..." class="min-w-0 flex-1 rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400" />
                         <button type="submit" class="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-amber-600">Cari peserta</button>
                     </form>
                 </section>
 
-                <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+                <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-100 text-left text-sm">
                             <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">

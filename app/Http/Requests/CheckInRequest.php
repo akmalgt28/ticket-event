@@ -14,7 +14,8 @@ class CheckInRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'token' => ['required', 'string', 'max:255'],
+            'token' => ['nullable', 'string', 'max:255', 'required_without:ticket_number'],
+            'ticket_number' => ['nullable', 'string', 'max:255', 'required_without:token'],
         ];
     }
 }

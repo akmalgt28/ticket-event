@@ -58,7 +58,7 @@ function verifyPayment(orderId) {
             <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p class="text-xs font-bold uppercase tracking-[0.28em] text-amber-600">Operations</p>
-                    <h2 class="mt-1 text-2xl font-black tracking-tight text-slate-900">Daftar order</h2>
+                    <h2 class="mt-1 text-2xl font-black tracking-tight text-slate-900">{{ filters.payment_status === 'pending' ? 'Verifikasi pembayaran' : 'Daftar order' }}</h2>
                 </div>
                 <a :href="route('organizer.participants.export')" class="text-sm font-bold text-slate-900 underline decoration-amber-400 decoration-2 underline-offset-4">Export peserta CSV</a>
             </div>
@@ -66,17 +66,17 @@ function verifyPayment(orderId) {
 
         <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl space-y-6">
-                <section class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                <section class="rounded-3xl border border-slate-200/80 bg-white p-5">
                     <form class="grid gap-3 md:grid-cols-[1fr_180px_180px_auto]" @submit.prevent="search">
-                        <input v-model="filterForm.search" type="search" placeholder="Cari nomor, nama, email..." class="rounded-2xl border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-amber-400 focus:ring-amber-400" />
-                        <select v-model="filterForm.status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-amber-400 focus:ring-amber-400">
+                        <input v-model="filterForm.search" type="search" placeholder="Cari nomor, nama, email..." class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400" />
+                        <select v-model="filterForm.status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400">
                             <option value="">Semua order</option>
                             <option value="pending">Pending</option>
                             <option value="paid">Paid</option>
                             <option value="expired">Expired</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
-                        <select v-model="filterForm.payment_status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-amber-400 focus:ring-amber-400">
+                        <select v-model="filterForm.payment_status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400">
                             <option value="">Semua payment</option>
                             <option value="pending">Pending</option>
                             <option value="paid">Paid</option>
@@ -86,7 +86,7 @@ function verifyPayment(orderId) {
                     </form>
                 </section>
 
-                <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+                <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-100 text-left text-sm">
                             <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
@@ -128,3 +128,4 @@ function verifyPayment(orderId) {
         </div>
     </AuthenticatedLayout>
 </template>
+

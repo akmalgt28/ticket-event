@@ -40,6 +40,18 @@ class AuthorizationTest extends TestCase
         $this->assertFalse($staff->can('orders.manage'));
     }
 
+    public function test_sanctum_user_endpoint_requires_authentication(): void
+    {
+        $this->getJson('/api/user')->assertUnauthorized();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/user')
+            ->assertOk()
+            ->assertJsonPath('id', $user->id);
+    }
+
     public function test_policies_enforce_role_permissions(): void
     {
         $this->seed();

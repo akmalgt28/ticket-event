@@ -34,6 +34,7 @@ Route::get('/events/{event:slug}', [PublicEventPageController::class, 'show'])->
 Route::middleware(['auth', 'verified', 'throttle:30,1'])->post('/payments/verify', [PaymentVerificationController::class, 'store'])->name('payments.verify');
 Route::middleware(['auth', 'verified'])->prefix('organizer')->name('organizer.')->group(function () {
     Route::get('/orders', [OrganizerOrderController::class, 'index'])->name('orders.index');
+    Route::get('/payments', fn () => redirect()->route('organizer.orders.index', ['payment_status' => 'pending']))->name('payments.index');
     Route::get('/orders/{order}', [OrganizerOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/resend-eticket', [OrganizerOrderController::class, 'resendEticket'])->name('orders.resend-eticket');
     Route::get('/participants/export', [OrganizerParticipantController::class, 'export'])->name('participants.export');

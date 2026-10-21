@@ -64,6 +64,27 @@ class PublicEventApiTest extends TestCase
         $this->get('/events/'.$event->slug)->assertOk()->assertInertia(fn ($page) => $page->component('Public/EventDetail')->where('event.slug', $event->slug));
     }
 
+    public function test_public_event_search_filters_by_title_or_location(): void
+    {
+        $match = Event::factory()->create([
+            'status' => 'published',
+            'title' => 'Workshop Bandung',
+            'location_name' => 'Bandung Creative Hub',
+        ]);
+        Event::factory()->create([
+            'status' => 'published',
+            'title' => 'Workshop Jakarta',
+            'location_name' => 'Jakarta Selatan',
+        ]);
+
+        $this->get('/events?search=Bandung')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('filters.search', 'Bandung')
+                ->has('events.data', 1)
+                ->where('events.data.0.id', $match->id));
+    }
+
     public function test_unpublished_event_page_is_not_found(): void
     {
         $event = Event::factory()->create(['status' => 'draft']);
@@ -78,5 +99,15 @@ class PublicEventApiTest extends TestCase
         $this->get('/events/'.$event->slug.'/checkout')
             ->assertOk()
             ->assertInertia(fn ($page) => $page->component('Public/Checkout')->where('event.id', $event->id));
+    }
+
+    public function test_refreshing_checkout_page_does_not_create_an_order(): void
+    {
+        $event = Event::factory()->create(['status' => 'published']);
+
+        $this->get('/events/'.$event->slug.'/checkout')->assertOk();
+        $this->get('/events/'.$event->slug.'/checkout')->assertOk();
+
+        $this->assertDatabaseCount('orders', 0);
     }
 }

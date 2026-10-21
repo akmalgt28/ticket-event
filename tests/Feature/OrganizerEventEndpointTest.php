@@ -6,6 +6,8 @@ use App\Models\Event;
 use App\Models\TicketType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class OrganizerEventEndpointTest extends TestCase
@@ -84,5 +86,49 @@ class OrganizerEventEndpointTest extends TestCase
             ->assertOk()->assertInertia(fn ($page) => $page->component('Organizer/EventForm')->where('event', null));
         $this->actingAs($admin)->get('/organizer/events/'.$event->id.'/edit')
             ->assertOk()->assertInertia(fn ($page) => $page->component('Organizer/EventForm')->where('event.id', $event->id));
+    }
+
+    public function test_event_banner_rejects_non_image_upload(): void
+    {
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $response = $this->actingAs($admin)->post('/organizer/events', [
+            'title' => 'Invalid Banner Event',
+            'description' => 'Event with invalid banner.',
+            'banner' => UploadedFile::fake()->create('document.pdf', 100, 'application/pdf'),
+            'start_at' => '2026-12-01 09:00:00',
+            'end_at' => '2026-12-01 17:00:00',
+            'location_name' => 'Main Hall',
+            'location_address' => 'Jakarta',
+        ]);
+
+        $response->assertSessionHasErrors('banner');
+        $this->assertDatabaseMissing('events', ['title' => 'Invalid Banner Event']);
+    }
+
+    public function test_admin_can_upload_event_banner(): void
+    {
+        Storage::fake('public');
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $response = $this->actingAs($admin)->withHeaders(['X-Inertia' => 'true'])->post('/organizer/events', [
+            'title' => 'Banner Event',
+            'description' => 'Event with a banner.',
+            'banner' => UploadedFile::fake()->image('banner.jpg', 1200, 630),
+            'start_at' => '2026-12-01 09:00:00',
+            'end_at' => '2026-12-01 17:00:00',
+            'location_name' => 'Main Hall',
+            'location_address' => 'Jakarta',
+        ]);
+
+        $response->assertRedirect(route('organizer.events.index'));
+        $event = Event::query()->where('title', 'Banner Event')->firstOrFail();
+
+        $this->assertNotNull($event->banner_path);
+        Storage::disk('public')->assertExists($event->banner_path);
     }
 }
