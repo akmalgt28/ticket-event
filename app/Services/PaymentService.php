@@ -5,17 +5,19 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Mail\EticketMail;
-use App\Models\AuditLog;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class PaymentService
 {
-    public function __construct(private TicketIssuanceService $ticketIssuance) {}
+    public function __construct(private TicketIssuanceService $ticketIssuance, private AuditLogService $auditLogs) {}
 
     public function selectManualTransfer(Order $order): Payment
     {
@@ -46,6 +48,51 @@ class PaymentService
                 'status' => PaymentStatus::Pending,
             ]);
         });
+    }
+
+    public function uploadManualProof(Order $order, UploadedFile $proof): Payment
+    {
+        $path = $proof->store('payment-proofs', 'public');
+
+        try {
+            return DB::transaction(function () use ($order, $path): Payment {
+                $lockedOrder = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+
+                if ($lockedOrder->order_status !== OrderStatus::Pending || $lockedOrder->expires_at?->isPast()) {
+                    throw ValidationException::withMessages([
+                        'order' => 'This order is no longer accepting payment.',
+                    ]);
+                }
+
+                $payment = $lockedOrder->payments()
+                    ->where('status', PaymentStatus::Pending)
+                    ->latest('id')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $payment) {
+                    throw ValidationException::withMessages([
+                        'payment' => 'Select manual transfer before uploading proof.',
+                    ]);
+                }
+
+                $oldPath = $payment->proof_path;
+                $payment->update([
+                    'proof_path' => $path,
+                    'proof_uploaded_at' => now(),
+                ]);
+
+                if ($oldPath && $oldPath !== $path) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                return $payment->fresh();
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($path);
+
+            throw $exception;
+        }
     }
 
     /**
@@ -127,18 +174,17 @@ class PaymentService
                 );
             }
 
-            $auditLog = new AuditLog([
-                'action' => 'payment.manual_verified',
-                'old_values' => $oldValues,
-                'new_values' => [
+            $this->auditLogs->record(
+                'payment.manual_verified',
+                $payment,
+                $user,
+                $oldValues,
+                [
                     'payment_status' => $targetStatus->value,
                     'order_status' => $lockedOrder->order_status->value,
                     'note' => $data['note'] ?? null,
                 ],
-            ]);
-            $auditLog->user()->associate($user);
-            $auditLog->auditable()->associate($payment);
-            $auditLog->save();
+            );
 
             return $payment->fresh();
         });

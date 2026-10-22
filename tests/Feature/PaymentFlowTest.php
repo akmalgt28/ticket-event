@@ -9,7 +9,9 @@ use App\Models\OrderItem;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PaymentFlowTest extends TestCase
@@ -22,6 +24,7 @@ class PaymentFlowTest extends TestCase
 
         $response = $this->postJson('/api/orders/'.$order->id.'/payments/manual', [
             'method' => 'bank_transfer',
+            'customer_email' => $order->customer_email,
         ]);
 
         $response->assertCreated()
@@ -34,6 +37,37 @@ class PaymentFlowTest extends TestCase
         ]);
     }
 
+    public function test_guest_cannot_select_manual_payment_for_another_customers_order(): void
+    {
+        $order = Order::factory()->create(['customer_email' => 'owner@example.com']);
+
+        $this->postJson('/api/orders/'.$order->id.'/payments/manual', [
+            'method' => 'bank_transfer',
+            'customer_email' => 'other@example.com',
+        ])->assertForbidden();
+    }
+
+    public function test_customer_can_upload_manual_payment_proof(): void
+    {
+        Storage::fake('public');
+        $order = Order::factory()->create();
+
+        $this->postJson('/api/orders/'.$order->id.'/payments/manual', [
+            'method' => 'bank_transfer',
+            'customer_email' => $order->customer_email,
+        ])->assertCreated();
+
+        $response = $this->post('/api/orders/'.$order->id.'/payments/manual/proof', [
+            'customer_email' => $order->customer_email,
+            'proof' => UploadedFile::fake()->image('receipt.jpg'),
+        ]);
+
+        $response->assertOk()->assertJsonPath('data.status', 'pending');
+        $payment = $order->payments()->firstOrFail();
+        $this->assertNotNull($payment->proof_path);
+        Storage::disk('public')->assertExists($payment->proof_path);
+    }
+
     public function test_admin_can_verify_manual_payment_and_order_is_marked_paid(): void
     {
         Mail::fake();
@@ -43,6 +77,7 @@ class PaymentFlowTest extends TestCase
         $order = Order::factory()->create();
         $this->postJson('/api/orders/'.$order->id.'/payments/manual', [
             'method' => 'bank_transfer',
+            'customer_email' => $order->customer_email,
         ])->assertCreated();
 
         $response = $this->actingAs($admin)->postJson('/payments/verify', [
@@ -100,7 +135,7 @@ class PaymentFlowTest extends TestCase
         $admin->assignRole('admin');
         $order = Order::factory()->create();
         OrderItem::factory()->for($order)->create(['quantity' => 1]);
-        $this->postJson('/api/orders/'.$order->id.'/payments/manual', ['method' => 'bank_transfer'])->assertCreated();
+        $this->postJson('/api/orders/'.$order->id.'/payments/manual', ['method' => 'bank_transfer', 'customer_email' => $order->customer_email])->assertCreated();
         $payload = [
             'order_id' => $order->id,
             'status' => 'paid',

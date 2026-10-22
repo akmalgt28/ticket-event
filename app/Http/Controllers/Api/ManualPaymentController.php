@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ManualPaymentProofRequest;
 use App\Http\Requests\ManualPaymentRequest;
 use App\Http\Resources\PaymentResource;
 use App\Models\Order;
@@ -16,5 +17,12 @@ class ManualPaymentController extends Controller
         return (new PaymentResource($payments->selectManualTransfer($order)))
             ->response()
             ->setStatusCode(201);
+    }
+
+    public function uploadProof(Order $order, ManualPaymentProofRequest $request, PaymentService $payments): JsonResponse
+    {
+        $payment = $payments->uploadManualProof($order, $request->file('proof'));
+
+        return (new PaymentResource($payment))->response();
     }
 }

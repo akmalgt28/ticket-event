@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'paid_at',
     'raw_response',
+    'proof_path',
+    'proof_uploaded_at',
 ])]
 class Payment extends Model
 {
@@ -31,6 +33,7 @@ class Payment extends Model
             'amount' => 'decimal:2',
             'paid_at' => 'datetime',
             'raw_response' => 'array',
+            'proof_uploaded_at' => 'datetime',
         ];
     }
 

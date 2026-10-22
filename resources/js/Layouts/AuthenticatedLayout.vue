@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
@@ -9,7 +8,7 @@ const showingNavigationDropdown = ref(false);
 </script>
 
 <template>
-    <div class="min-h-screen bg-[var(--brand-paper)] text-[var(--brand-ink)]">
+    <div class="flex min-h-screen flex-col bg-[var(--brand-paper)] text-[var(--brand-ink)]">
         <nav class="border-b border-slate-300 bg-white">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex min-h-16 items-center justify-between gap-6">
@@ -52,6 +51,6 @@ const showingNavigationDropdown = ref(false);
         <header v-if="$slots.header" class="border-b border-slate-300 bg-white">
             <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"><slot name="header" /></div>
         </header>
-        <main><slot /></main>
+        <main class="flex-1"><slot /></main>
     </div>
 </template>

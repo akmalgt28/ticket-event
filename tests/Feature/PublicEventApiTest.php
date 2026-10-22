@@ -55,6 +55,11 @@ class PublicEventApiTest extends TestCase
             ->assertJsonMissingPath('data.organizer_id');
     }
 
+    public function test_root_redirects_to_public_event_catalog(): void
+    {
+        $this->get('/')->assertRedirect(route('public.events.index'));
+    }
+
     public function test_guest_can_open_public_event_pages(): void
     {
         $event = Event::factory()->create(['status' => 'published']);
