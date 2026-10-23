@@ -21,6 +21,7 @@ Route::get('/events', [PublicEventPageController::class, 'index'])->name('public
 Route::get('/order-status', PublicOrderStatusPageController::class)->name('public.orders.status');
 Route::get('/events/{event:slug}/checkout', [PublicEventPageController::class, 'checkout'])->name('public.events.checkout');
 Route::get('/events/{event:slug}', [PublicEventPageController::class, 'show'])->name('public.events.show');
+Route::get('/events/{event:slug}/data-diri', [PublicEventPageController::class, 'dataDiri'])->name('public.events.data-diri');
 
 Route::middleware(['auth', 'verified', 'throttle:30,1'])->post('/payments/verify', [PaymentVerificationController::class, 'store'])->name('payments.verify');
 Route::middleware(['auth', 'verified'])->prefix('organizer')->name('organizer.')->group(function () {

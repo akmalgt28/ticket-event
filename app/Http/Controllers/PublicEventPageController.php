@@ -36,6 +36,15 @@ class PublicEventPageController extends Controller
         ]);
     }
 
+    public function dataDiri($slug)
+{
+    $event = \App\Models\Event::where('slug', $slug)->firstOrFail();
+
+    return inertia('Pages/Public/DataDiri', [
+        'event' => $event
+    ]);
+}
+
     public function checkout(Event $event): Response
     {
         abort_unless($event->status === EventStatus::Published, 404);
