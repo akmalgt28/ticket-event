@@ -36,6 +36,32 @@ class PublicEventPageController extends Controller
         ]);
     }
 
+    public function dataDiri(Event $event, Request $request): Response
+    {
+        abort_unless($event->status === EventStatus::Published, 404);
+        $event->load(['ticketTypes' => fn ($query) => $query->where('status', TicketTypeStatus::Active)->availableForSale()->orderBy('price')]);
+
+        $eventData = $this->eventData($event);
+        $quantities = collect($request->query('qty', []));
+        $selectedItems = collect($eventData['ticket_types'])
+            ->map(function (array $ticket) use ($quantities): ?array {
+                $quantity = (int) $quantities->get((string) $ticket['id'], 0);
+
+                return $quantity > 0 ? [
+                    'ticket_type_id' => $ticket['id'],
+                    'quantity' => min($quantity, 20),
+                ] : null;
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        return Inertia::render('Public/DataDiri', [
+            'event' => $eventData,
+            'selectedItems' => $selectedItems,
+        ]);
+    }
+
     public function checkout(Event $event): Response
     {
         abort_unless($event->status === EventStatus::Published, 404);
