@@ -124,6 +124,21 @@ class OrganizerOrderEndpointTest extends TestCase
         $response->assertOk()->assertInertia(fn ($page) => $page->component('Organizer/Orders'));
     }
 
+    public function test_order_page_shows_latest_payment_and_its_transfer_proof(): void
+    {
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $order = Order::factory()->create();
+        Payment::factory()->for($order)->create(['status' => 'failed']);
+        Payment::factory()->for($order)->create(['status' => 'pending', 'proof_path' => 'payment-proofs/latest.png']);
+
+        $this->actingAs($admin)->get('/organizer/orders')->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('orders.data.0.payment.status', 'pending')
+                ->where('orders.data.0.payment.proof_url', fn ($url) => str_ends_with($url, '/payment-proofs/latest.png')));
+    }
+
     public function test_admin_can_open_participants_inertia_page(): void
     {
         $this->seed();

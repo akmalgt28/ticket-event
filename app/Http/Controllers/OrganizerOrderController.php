@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -26,7 +27,7 @@ class OrganizerOrderController extends Controller
         $orders = Order::query()
             ->with('event:id,title')
             ->withCount('tickets')
-            ->when(! $request->expectsJson(), fn ($query) => $query->with('payments:id,order_id,status,amount,paid_at'))
+            ->when(! $request->expectsJson(), fn ($query) => $query->with(['payments' => fn ($query) => $query->latest('id')]))
             ->when($request->filled('status'), function ($query) use ($request): void {
                 $status = OrderStatus::tryFrom((string) $request->query('status'));
 
@@ -74,6 +75,7 @@ class OrganizerOrderController extends Controller
                 'payment' => $order->payments->first() ? [
                     'status' => $order->payments->first()->status?->value,
                     'amount' => (string) $order->payments->first()->amount,
+                    'proof_url' => $order->payments->first()->proof_path ? Storage::disk('public')->url($order->payments->first()->proof_path) : null,
                 ] : null,
             ]),
             'filters' => [

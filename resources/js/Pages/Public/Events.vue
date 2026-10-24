@@ -1,49 +1,45 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import EventPoster from '@/Components/EventPoster.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
-const props = defineProps({
-    events: { type: Object, required: true },
-    filters: { type: Object, required: true },
-});
-
-const formatDate = (value) => new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeZone: 'Asia/Jakarta' }).format(new Date(value));
+defineProps({ events: { type: Object, required: true }, filters: { type: Object, required: true } });
+const formatDate = (value) => value ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeZone: 'Asia/Jakarta' }).format(new Date(value)) : 'Segera diumumkan';
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(value));
+const firstPrice = (event) => event.ticket_types.find((ticket) => ticket.remaining_quota > 0)?.price;
 </script>
 
 <template>
-    <Head title="Jelajah event" />
+    <Head title="Jelajah Event" />
     <PublicLayout>
-        <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <section class="grid gap-8 border-b border-slate-300 pb-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-                <div>
-                    <p class="text-xs font-black uppercase tracking-[0.28em] text-[var(--brand-primary)]">Kalender pilihan</p>
-                    <h1 class="mt-4 max-w-4xl text-5xl font-black leading-[0.95] tracking-[-0.06em] text-[var(--brand-ink)] sm:text-7xl">Temukan alasan untuk keluar rumah.</h1>
-                </div>
-                <div class="border-l-2 border-[var(--brand-primary)] pl-5 text-base leading-7 text-slate-600">
-                    <p>Event kecil, kelas praktis, dan pengalaman yang layak diingat.</p>
-                    <p class="mt-3 font-bold text-[var(--brand-ink)]">{{ events.total }} event tersedia</p>
-                </div>
+        <div class="mx-auto max-w-6xl px-5 py-8 sm:px-8 md:py-12">
+            <section class="mb-8 text-white">
+                <span class="arc-badge mb-4">Ticket Event</span>
+                <h1 class="max-w-2xl text-3xl font-bold leading-tight sm:text-4xl">Temukan event dan pengalaman berikutnya.</h1>
+                <p class="mt-4 text-sm text-blue-100">{{ events.total }} event tersedia. Pilih event, pesan tiket, dan sampai jumpa di sana.</p>
             </section>
-            <section class="mt-8 flex flex-col gap-3 border-b border-slate-300 pb-4 sm:flex-row sm:items-center sm:justify-between">
-                <p class="text-sm text-slate-600"><span v-if="filters.search">Hasil pencarian untuk <strong class="text-[var(--brand-ink)]">“{{ filters.search }}”</strong></span><span v-else>Semua event yang sedang dibuka untuk umum</span></p>
-                <Link v-if="filters.search" href="/events" class="text-sm font-black text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)]">Hapus pencarian</Link>
-            </section>
-            <section class="mt-8 grid gap-px border border-slate-300 bg-slate-300 md:grid-cols-2 lg:grid-cols-3">
-                <article v-for="event in events.data" :key="event.id" class="group bg-white">
-                    <Link :href="route('public.events.show', event.slug)" class="block">
-                        <div class="aspect-[4/3] bg-slate-900 bg-cover bg-center" :style="event.banner_url ? { backgroundImage: `url(${event.banner_url})` } : {}">
-                            <div class="flex h-full items-end bg-gradient-to-t from-slate-950/75 via-transparent to-transparent p-5"><span class="text-xs font-black uppercase tracking-[0.18em] text-white">{{ formatDate(event.start_at) }}</span></div>
-                        </div>
-                        <div class="border-t border-slate-200 p-5 transition group-hover:bg-[var(--brand-paper)]">
-                            <h2 class="text-2xl font-black tracking-tight text-[var(--brand-ink)]">{{ event.title }}</h2>
-                            <p class="mt-2 text-sm text-slate-500">{{ event.location_name || 'Lokasi diumumkan segera' }}</p>
-                            <div class="mt-6 flex items-center justify-between gap-3 text-sm"><span v-if="event.ticket_types.length" class="font-bold text-slate-700">Mulai {{ money(event.ticket_types[0].price) }}</span><span v-else class="font-bold text-rose-600">Tiket segera hadir</span><span class="font-black text-[var(--brand-primary)]">Lihat detail →</span></div>
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm text-white">
+                <p>{{ filters.search ? 'Hasil pencarian: “' + filters.search + '”' : 'Event yang sedang dibuka untuk umum' }}</p>
+                <Link v-if="filters.search" :href="route('public.events.index')" class="underline underline-offset-4">Hapus pencarian</Link>
+            </div>
+            <section class="grid min-w-0 gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-label="Daftar event">
+                <article v-for="event in events.data" :key="event.id" class="min-w-0 overflow-hidden rounded-2xl bg-white">
+                    <Link :href="route('public.events.show', event.slug)" class="group block h-full">
+                        <EventPoster :event="event" />
+                        <div class="p-5">
+                            <p class="text-xs font-semibold text-[var(--arc-blue)]">{{ formatDate(event.start_at) }}</p>
+                            <h2 class="mt-2 text-lg font-bold leading-6">{{ event.title }}</h2>
+                            <p class="mt-2 text-sm text-slate-600">{{ event.location_name || 'Lokasi akan diumumkan' }}</p>
+                            <div class="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm"><span class="font-semibold">{{ firstPrice(event) !== undefined ? 'Mulai ' + money(firstPrice(event)) : 'Tiket belum tersedia' }}</span><span class="font-semibold text-[var(--arc-blue)] group-hover:underline">Lihat detail →</span></div>
                         </div>
                     </Link>
                 </article>
             </section>
-            <div v-if="!events.data.length" class="mt-8 border border-dashed border-slate-400 bg-white p-12 text-center"><h2 class="text-2xl font-black text-[var(--brand-ink)]">Tidak ada event yang cocok.</h2><p class="mt-2 text-slate-600">Coba kata kunci lain atau lihat semua event.</p></div>
+            <div v-if="!events.data.length" class="arc-card mt-6 text-center"><h2 class="text-lg font-bold">Tidak ada event yang cocok.</h2><p class="mt-2 text-sm text-slate-600">Coba kata kunci lain melalui menu pencarian.</p></div>
+            <nav v-if="events.last_page > 1" aria-label="Halaman event" class="mt-8 flex flex-wrap items-center justify-between gap-4 text-sm text-white">
+                <span>Halaman {{ events.current_page }} dari {{ events.last_page }}</span>
+                <div class="flex gap-4"><Link v-if="events.prev_page_url" :href="events.prev_page_url" class="underline underline-offset-4">Sebelumnya</Link><Link v-if="events.next_page_url" :href="events.next_page_url" class="underline underline-offset-4">Berikutnya</Link></div>
+            </nav>
         </div>
     </PublicLayout>
 </template>
