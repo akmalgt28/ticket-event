@@ -39,7 +39,10 @@ class PaymentService
                 return $pendingPayment;
             }
 
-            $lockedOrder->update(['payment_method' => 'bank_transfer']);
+            $lockedOrder->update([
+                'payment_method' => 'bank_transfer',
+                'payment_status' => PaymentStatus::Pending,
+            ]);
 
             return $lockedOrder->payments()->create([
                 'provider' => 'manual',
@@ -119,6 +122,12 @@ class PaymentService
 
                 throw ValidationException::withMessages([
                     'status' => 'This payment has already been processed.',
+                ]);
+            }
+
+            if ($lockedOrder->order_status !== OrderStatus::Pending || $lockedOrder->expires_at?->isPast()) {
+                throw ValidationException::withMessages([
+                    'order_id' => 'This order is no longer accepting payment.',
                 ]);
             }
 

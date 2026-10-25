@@ -21,11 +21,11 @@ body {
     font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
 }
 
-*, *::before, *::after {
+*:not(.public-site, .public-site *), *:not(.public-site, .public-site *)::before, *:not(.public-site, .public-site *)::after {
     box-shadow: none !important;
 }
 
-[class*='rounded-'] {
+[class*='rounded-']:not(.public-site, .public-site *) {
     border-radius: var(--ui-radius) !important;
 }
 
@@ -50,6 +50,25 @@ body {
 .brand-text { color: var(--brand-primary); }
 .brand-border { border-color: color-mix(in srgb, var(--brand-primary) 35%, transparent); }
 .brand-focus:focus { border-color: var(--brand-primary); outline: 2px solid color-mix(in srgb, var(--brand-primary) 25%, transparent); outline-offset: 1px; }
+
+.public-site {
+    --arc-blue: #144ba3;
+    --arc-sky: #e3f3ff;
+    --brand-primary: #144ba3;
+    --brand-primary-dark: #0e397e;
+    --brand-paper: #e3f3ff;
+    --brand-ink: #102c57;
+    overflow-wrap: anywhere;
+    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer components {
+    .arc-card { @apply rounded-2xl bg-white p-5 text-slate-950 sm:p-6; }
+    .arc-badge { @apply inline-flex max-w-full items-center rounded-full bg-white px-4 py-1 text-xs font-semibold text-[var(--arc-blue)]; }
+    .arc-button { @apply inline-flex min-h-10 items-center justify-center rounded-full bg-[var(--arc-blue)] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#0e397e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50; }
+    .arc-input { @apply block w-full rounded-lg border border-blue-400 bg-white px-3 py-2 text-base text-slate-950 focus:border-blue-700 focus:ring-1 focus:ring-blue-700; }
+    .arc-dock { @apply fixed inset-x-0 bottom-0 z-30 rounded-t-2xl bg-[var(--arc-sky)] px-5 pt-4 text-slate-950 md:static md:rounded-2xl md:p-5; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+}
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

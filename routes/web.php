@@ -19,7 +19,10 @@ Route::get('/', fn () => redirect()->route('public.events.index'));
 Route::get('/dashboard', OrganizerDashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/events', [PublicEventPageController::class, 'index'])->name('public.events.index');
 Route::get('/order-status', PublicOrderStatusPageController::class)->name('public.orders.status');
+Route::get('/payment', PublicOrderStatusPageController::class)->name('public.orders.payment');
 Route::get('/events/{event:slug}/checkout', [PublicEventPageController::class, 'checkout'])->name('public.events.checkout');
+Route::get('/events/{event:slug}/data-diri', [PublicEventPageController::class, 'dataDiri'])->name('public.events.data-diri');
+Route::post('/events/{event:slug}/data-diri', [PublicEventPageController::class, 'storeCheckout'])->middleware('throttle:10,1')->name('public.events.orders.store');
 Route::get('/events/{event:slug}', [PublicEventPageController::class, 'show'])->name('public.events.show');
 Route::get('/events/{event:slug}/data-diri', [PublicEventPageController::class, 'dataDiri'])->name('public.events.data-diri');
 

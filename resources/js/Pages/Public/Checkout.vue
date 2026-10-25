@@ -1,147 +1,69 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
-import { computed, reactive } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import EventPoster from '@/Components/EventPoster.vue';
+import PublicIcon from '@/Components/PublicIcon.vue';
+import { computed, reactive, ref } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 
-const props = defineProps({ event: { type: Object, required: true } });
-
-// State reaktif untuk menyimpan jumlah setiap tiket yang dipilih
-const quantities = reactive(Object.fromEntries(props.event.ticket_types.map((ticket) => [ticket.id, 0])));
-
-// Computed property untuk menghitung total tiket dan estimasi harga
+const props = defineProps({ event: { type: Object, required: true }, quantities: { type: Object, default: () => ({}) } });
+const page = usePage();
+const navigating = ref(false);
+const ticketLimit = (ticket) => Math.min(20, ticket.remaining_quota);
+const quantities = reactive(Object.fromEntries(props.event.ticket_types.map((ticket) => [ticket.id, Math.max(0, Math.min(ticketLimit(ticket), Math.trunc(Number(props.quantities[ticket.id]) || 0)))])));
 const selectedItems = computed(() => props.event.ticket_types.filter((ticket) => quantities[ticket.id] > 0).map((ticket) => ({ ticket, quantity: quantities[ticket.id] })));
 const totalQuantity = computed(() => selectedItems.value.reduce((total, item) => total + item.quantity, 0));
-const estimatedTotal = computed(() => selectedItems.value.reduce((total, item) => total + (Number(item.ticket.price) * item.quantity), 0));
-
-// Format mata uang
+const estimatedTotal = computed(() => selectedItems.value.reduce((total, item) => total + Number(item.ticket.price) * item.quantity, 0));
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(value));
 
-// Fungsi untuk melanjutkan ke halaman isi data diri
 function lanjutKeDataDiri() {
-    if (totalQuantity.value === 0) return;
-    
-    const payload = Object.fromEntries(selectedItems.value.map(({ ticket, quantity }) => [ticket.id, quantity]));
-
+    if (totalQuantity.value === 0 || navigating.value) return;
     router.get(route('public.events.data-diri', props.event.slug), {
-        qty: payload,
+        qty: Object.fromEntries(selectedItems.value.map(({ ticket, quantity }) => [ticket.id, quantity])),
+    }, {
+        onStart: () => { navigating.value = true; },
+        onFinish: () => { navigating.value = false; },
     });
 }
 </script>
 
 <template>
-    <Head :title="`Pilih Tiket · ${event.title}`" />
-    
+    <Head :title="'Pilih Tiket · ' + event.title" />
     <PublicLayout>
-        <div class="flex justify-center bg-gray-100 min-h-screen font-sans">
-            <!-- Container khusus gaya mobile[cite: 10] -->
-            <div class="w-full max-w-[414px] bg-[#10489d] min-h-screen relative shadow-2xl overflow-hidden pb-32">
-                
-                <!-- Navbar Mobile-Like ARC[cite: 10] -->
-                <div class="bg-white flex justify-between items-center p-4 sticky top-0 z-40 shadow-sm">
-                    <div class="text-[#10489d] text-2xl font-black italic tracking-tighter">ARC</div>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-[#10489d] cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
+        <div class="mx-auto max-w-5xl pb-32 md:px-8 md:py-8">
+            <div class="grid min-w-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-start md:gap-10">
+                <div class="min-w-0 md:sticky md:top-24">
+                    <EventPoster :event="event" class="md:rounded-2xl" />
+                    <div class="hidden pt-5 text-white md:block"><h1 class="text-2xl font-bold">{{ event.title }}</h1><p class="mt-2 text-sm text-blue-100">Pilih kategori dan jumlah tiket untuk melanjutkan.</p></div>
                 </div>
-
-                <!-- Banner Event[cite: 10] -->
-                <div 
-                    class="w-full aspect-[4/3] bg-cover bg-center" 
-                    :style="event.banner_url ? { backgroundImage: `url(${event.banner_url})` } : { backgroundColor: '#263246' }" 
-                    role="img" 
-                ></div>
-
-                <div class="p-5">
-                    
-                    <!-- Loop untuk merender setiap tiket dari database -->
-                    <div v-for="ticket in event.ticket_types" :key="ticket.id" class="mb-6">
-                        
-                        <!-- Badge Status Tiket[cite: 10] -->
-                        <span 
-                            class="px-4 py-1.5 rounded-full text-xs font-bold inline-block mb-3 shadow-sm"
-                            :class="ticket.remaining_quota > 0 ? 'bg-white text-[#10489d]' : 'bg-gray-200 text-[#10489d] opacity-90'"
-                        >
-                            {{ ticket.remaining_quota > 0 ? 'Tersedia' : 'Habis' }}
-                        </span>
-                        
-                        <!-- Kartu Tiket[cite: 10] -->
-                        <div 
-                            class="rounded-xl relative overflow-hidden transition-colors duration-200"
-                            :class="[
-                                ticket.remaining_quota === 0 ? 'bg-[#d8d8d8] opacity-80' : 
-                                quantities[ticket.id] > 0 ? 'bg-[#e5e7eb]' : 'bg-white'
-                            ]"
-                        >
-                            <!-- Bagian Atas Kartu (Nama Tiket) -->
-                            <div class="p-4 pb-3">
-                                <h4 class="font-bold text-gray-900 text-sm">{{ ticket.name }}</h4>
-                            </div>
-                            
-                            <!-- Bagian Bawah Kartu (Harga & Kontrol) dengan efek potongan tiket -->
-                            <div class="border-t-[1.5px] border-gray-400 relative p-4 flex justify-between items-center min-h-[70px]">
-                                <!-- Lingkaran pemotong kiri & kanan (Efek visual tiket) -->
-                                <div class="absolute -left-3 top-[-10px] w-5 h-5 bg-[#10489d] rounded-full"></div>
-                                <div class="absolute -right-3 top-[-10px] w-5 h-5 bg-[#10489d] rounded-full"></div>
-
-                                <div class="font-bold text-gray-900 text-sm">
-                                    {{ money(ticket.price) }}
-                                </div>
-                                
-                                <!-- Kondisi Logika Tombol[cite: 10] -->
-                                <!-- 1. Jika Tiket Habis -->
-                                <div v-if="ticket.remaining_quota === 0">
-                                    <!-- Tombol tidak muncul jika habis, sesuai desain referensi -->
-                                </div>
-                                
-                                <!-- 2. Jika Tiket Tersedia tapi belum dipilih (Tampil tombol 'Pilih') -->
-                                <button 
-                                    v-else-if="quantities[ticket.id] === 0" 
-                                    @click="quantities[ticket.id] = 1"
-                                    class="bg-[#10489d] hover:bg-blue-800 text-white px-6 py-1.5 rounded-full font-bold text-xs transition-colors"
-                                >
-                                    Pilih
-                                </button>
-                                
-                                <!-- 3. Jika Tiket sudah dipilih (Tampil kontrol + dan -) -->
-                                <div v-else class="flex items-center gap-3">
-                                    <button 
-                                        @click="quantities[ticket.id]--" 
-                                        class="w-7 h-7 rounded-full bg-[#10489d] text-white flex items-center justify-center font-bold text-lg leading-none active:scale-95 transition-transform"
-                                    >−</button>
-                                    <span class="font-bold text-gray-900 text-sm w-4 text-center">{{ quantities[ticket.id] }}</span>
-                                    <button 
-                                        @click="quantities[ticket.id] < ticket.remaining_quota ? quantities[ticket.id]++ : null" 
-                                        class="w-7 h-7 rounded-full bg-[#10489d] text-white flex items-center justify-center font-bold text-lg leading-none active:scale-95 transition-transform"
-                                        :class="{'opacity-50 cursor-not-allowed': quantities[ticket.id] >= ticket.remaining_quota}"
-                                    >+</button>
+                <div class="min-w-0 px-5 pt-4 md:px-0 md:pt-0">
+                    <Link :href="route('public.events.show', event.slug)" class="mb-5 inline-flex items-center gap-2 text-xs text-blue-100"><PublicIcon name="arrow" class="h-4 w-4" /> Detail event</Link>
+                    <h1 class="sr-only">Pilih tiket {{ event.title }}</h1>
+                    <p v-if="page.props.errors?.qty" role="alert" class="mb-5 rounded-xl bg-white p-4 text-sm text-rose-700">{{ page.props.errors.qty }}</p>
+                    <p v-if="!event.ticket_types.length" class="arc-card text-sm">Tiket belum tersedia untuk dibeli.</p>
+                    <div class="space-y-7">
+                        <article v-for="ticket in event.ticket_types" :key="ticket.id">
+                            <span class="arc-badge mb-3 bg-[#d9dce2]">{{ ticket.remaining_quota > 0 ? 'Tersedia' : 'Habis' }}</span>
+                            <div class="overflow-hidden rounded-2xl" :class="ticket.remaining_quota === 0 || quantities[ticket.id] > 0 ? 'bg-[#d9dce2]' : 'bg-white'">
+                                <div class="px-6 py-5"><h2 class="text-sm font-semibold">{{ ticket.name }}</h2><p v-if="ticket.description" class="mt-1 text-xs leading-5 text-slate-600">{{ ticket.description }}</p></div>
+                                <div class="relative flex min-h-16 items-center justify-between gap-3 border-t border-slate-300 px-6 py-3">
+                                    <span class="absolute -left-2.5 -top-2.5 h-5 w-5 rounded-full bg-[var(--arc-blue)]" aria-hidden="true"></span><span class="absolute -right-2.5 -top-2.5 h-5 w-5 rounded-full bg-[var(--arc-blue)]" aria-hidden="true"></span>
+                                    <p class="text-sm font-bold">{{ money(ticket.price) }}</p>
+                                    <span v-if="ticket.remaining_quota === 0" class="sr-only">Tiket habis</span>
+                                    <button v-else-if="quantities[ticket.id] === 0" type="button" class="arc-button min-h-9 px-7 py-1.5 text-xs" :aria-label="'Pilih ' + ticket.name" @click="quantities[ticket.id] = 1">Pilih</button>
+                                    <div v-else class="flex shrink-0 items-center gap-2">
+                                        <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--arc-blue)] text-xl text-white" :aria-label="'Kurangi ' + ticket.name" @click="quantities[ticket.id] = Math.max(0, quantities[ticket.id] - 1)">−</button>
+                                        <output class="min-w-5 text-center text-sm font-semibold" aria-live="polite">{{ quantities[ticket.id] }}</output>
+                                        <button type="button" class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--arc-blue)] text-xl text-white disabled:cursor-not-allowed disabled:opacity-40" :aria-label="'Tambah ' + ticket.name" :disabled="quantities[ticket.id] >= ticketLimit(ticket)" @click="quantities[ticket.id] = Math.min(ticketLimit(ticket), quantities[ticket.id] + 1)">+</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
+                        </article>
+                    </div>
+                    <div class="arc-dock mt-6 flex items-center justify-between gap-4">
+                        <div class="min-w-0 text-sm" aria-live="polite"><p class="font-semibold">{{ totalQuantity ? totalQuantity + ' tiket dipilih' : 'Pilih tiket' }}</p><p v-if="selectedItems.length" class="mt-1 text-xs text-slate-600">{{ selectedItems.map(({ ticket, quantity }) => ticket.name + ' ×' + quantity).join(', ') }}</p><p class="mt-1 font-bold">{{ money(estimatedTotal) }}</p></div>
+                        <button type="button" class="arc-button shrink-0 px-8" :disabled="totalQuantity === 0 || navigating" @click="lanjutKeDataDiri">{{ navigating ? 'Memproses...' : 'Beli' }}</button>
                     </div>
                 </div>
-
-                <!-- Floating Bottom Bar[cite: 10] -->
-                <div class="fixed bottom-0 w-full max-w-[414px] bg-[#f0f4f9] rounded-t-[20px] shadow-[0_-8px_20px_rgba(0,0,0,0.15)] p-5 px-6 flex justify-between items-center z-50">
-                    <div>
-                        <p class="text-[13px] font-bold text-gray-900 mb-1">
-                            {{ totalQuantity > 0 ? `${selectedItems[0].ticket.name} x${totalQuantity}` : 'Pilih tiket' }}
-                        </p>
-                        <h3 class="text-gray-900 font-extrabold text-sm">
-                            {{ money(estimatedTotal) }}
-                        </h3>
-                    </div>
-                    
-                    <button 
-                        @click="lanjutKeDataDiri"
-                        :disabled="totalQuantity === 0"
-                        class="bg-[#10489d] text-white px-8 py-2 rounded-full font-bold text-sm transition-all"
-                        :class="totalQuantity === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-800 hover:shadow-lg'"
-                    >
-                        Beli
-                    </button>
-                </div>
-
             </div>
         </div>
     </PublicLayout>

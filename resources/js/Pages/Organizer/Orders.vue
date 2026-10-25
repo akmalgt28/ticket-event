@@ -66,6 +66,9 @@ function verifyPayment(orderId) {
 
         <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl space-y-6">
+                <div v-if="verificationForm.hasErrors" role="alert" class="rounded-2xl bg-rose-50 p-4 text-sm text-rose-700">
+                    <p v-for="(error, key) in verificationForm.errors" :key="key">{{ error }}</p>
+                </div>
                 <section class="rounded-3xl border border-slate-200/80 bg-white p-5">
                     <form class="grid gap-3 md:grid-cols-[1fr_180px_180px_auto]" @submit.prevent="search">
                         <input v-model="filterForm.search" type="search" placeholder="Cari nomor, nama, email..." class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400" />
@@ -107,6 +110,7 @@ function verifyPayment(orderId) {
                                     <td class="whitespace-nowrap px-5 py-4 font-semibold text-slate-800">{{ formatCurrency(order.total_amount) }}</td>
                                     <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ statusLabel(order.payment_status) }}</span></td>
                                     <td class="whitespace-nowrap px-5 py-4">
+                                        <a v-if="order.payment?.proof_url" :href="order.payment.proof_url" target="_blank" rel="noopener noreferrer" class="mr-3 text-xs font-bold text-sky-700 underline">Lihat bukti transfer</a>
                                         <button v-if="order.payment_status === 'pending' && order.payment" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700" :disabled="verificationForm.processing" @click="verifyPayment(order.id)">Verifikasi paid</button>
                                         <button v-else-if="order.payment_status === 'paid' && order.tickets_count > 0" type="button" class="rounded-xl bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700" :disabled="resendForm.processing" @click="resendEticket(order.id)">{{ resendForm.processing ? 'Mengirim...' : 'Kirim ulang e-ticket' }}</button>
                                         <span v-else class="text-xs text-slate-400">Tidak ada aksi</span>

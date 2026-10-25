@@ -1,57 +1,54 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { onUnmounted, ref } from 'vue';
+import { Link, router } from '@inertiajs/vue3';
 
+const menuOpen = ref(false);
+const menuButton = ref(null);
 const search = ref('');
+const stopNavigationListener = router.on('navigate', () => { menuOpen.value = false; });
+onUnmounted(stopNavigationListener);
+
+function closeMenu() {
+    menuOpen.value = false;
+    menuButton.value?.focus();
+}
 
 function submitSearch() {
-    router.get(route('public.events.index'), search.value.trim() ? { search: search.value.trim() } : {}, {
-        preserveState: true,
-        replace: true,
-    });
+    menuOpen.value = false;
+    router.get(route('public.events.index'), search.value.trim() ? { search: search.value.trim() } : {}, { replace: true });
 }
 </script>
 
 <template>
-    <div class="flex min-h-screen flex-col bg-[var(--brand-paper)] text-[var(--brand-ink)]">
-        <header class="sticky top-0 z-20 border-b border-slate-200 bg-[var(--brand-paper)]">
-            <div class="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
-                <Link href="/" class="flex shrink-0 items-center gap-3" aria-label="Ticket Event beranda">
-                    <span class="brand-bg-dark flex h-9 w-9 items-center justify-center text-sm font-black text-white">TE</span>
-                    <span class="hidden text-base font-black tracking-tight sm:inline">Ticket Event</span>
+    <div class="public-site flex min-h-dvh flex-col bg-[var(--arc-blue)] text-slate-950">
+        <a href="#main-content" class="sr-only z-[70] rounded-full bg-white px-4 py-2 text-sm focus:not-sr-only focus:fixed focus:left-4 focus:top-3">Lewati ke konten</a>
+        <header class="sticky top-0 z-50 bg-[var(--arc-sky)]" @keydown.esc="closeMenu">
+            <div class="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+                <Link :href="route('public.events.index')" aria-label="ARC — beranda Ticket Event" @click="menuOpen = false">
+                    <img src="/images/arc-logo.png" alt="ARC — PT Anugerah Rezeki Cemerlang" class="h-14 w-24 object-contain" width="96" height="56" />
                 </Link>
-
-                <nav class="hidden items-center gap-5 text-sm font-bold md:flex" aria-label="Navigasi publik">
-                    <Link href="/events" class="transition hover:text-[var(--brand-primary)]">Jelajah event</Link>
-                    <Link href="/order-status" class="transition hover:text-[var(--brand-primary)]">Cek order</Link>
+                <nav class="hidden items-center gap-7 text-sm font-semibold text-[var(--arc-blue)] md:flex" aria-label="Navigasi utama">
+                    <Link :href="route('public.events.index')">Jelajah event</Link>
+                    <Link :href="route('public.orders.status')">Cek status order</Link>
+                    <Link :href="$page.props.auth?.user ? route('dashboard') : route('login')">{{ $page.props.auth?.user ? 'Dashboard' : 'Login' }}</Link>
                 </nav>
-
-                <form class="ml-auto flex min-w-0 flex-1 justify-end sm:max-w-sm" @submit.prevent="submitSearch">
-                    <label class="sr-only" for="public-search">Cari event</label>
-                    <div class="flex w-full border border-slate-300 bg-white focus-within:border-[var(--brand-primary)]">
-                        <input id="public-search" v-model="search" type="search" placeholder="Cari event, kota, topik..." class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm focus:ring-0" />
-                        <button type="submit" class="brand-bg px-4 text-sm font-black text-white transition hover:bg-[var(--brand-primary-dark)]">Cari</button>
-                    </div>
-                </form>
-
-                <Link v-if="$page.props.auth?.user" :href="route('dashboard')" class="hidden text-sm font-black md:inline">Dashboard</Link>
-                <Link v-else :href="route('login')" class="hidden text-sm font-black md:inline">Login</Link>
-            </div>
-            <div class="border-t border-slate-200 px-4 py-2 md:hidden">
-                <nav class="mx-auto flex max-w-7xl items-center gap-5 text-sm font-bold" aria-label="Navigasi mobile">
-                    <Link href="/events" class="hover:text-[var(--brand-primary)]">Jelajah event</Link>
-                    <Link href="/order-status" class="hover:text-[var(--brand-primary)]">Cek order</Link>
-                    <Link v-if="$page.props.auth?.user" :href="route('dashboard')" class="ml-auto">Dashboard</Link>
-                    <Link v-else :href="route('login')" class="ml-auto">Login</Link>
-                </nav>
+                <button ref="menuButton" type="button" class="flex h-11 w-11 items-center justify-center rounded-lg text-[var(--arc-blue)] transition hover:bg-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" :aria-expanded="menuOpen" aria-controls="public-menu" :aria-label="menuOpen ? 'Tutup menu' : 'Buka menu'" @click="menuOpen = !menuOpen">
+                    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path v-if="menuOpen" d="m6 6 12 12M6 18 18 6" /><path v-else d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+                <div v-if="menuOpen" id="public-menu" class="absolute inset-x-0 top-full border-t border-blue-200 bg-[var(--arc-sky)] px-5 pb-5 pt-3 sm:px-8">
+                    <nav class="mx-auto grid max-w-6xl gap-1 text-sm font-semibold text-[var(--arc-blue)]" aria-label="Menu publik">
+                        <Link :href="route('public.events.index')" class="rounded-lg px-3 py-3 hover:bg-white">Jelajah event</Link>
+                        <Link :href="route('public.orders.status')" class="rounded-lg px-3 py-3 hover:bg-white">Cek status order</Link>
+                        <Link :href="$page.props.auth?.user ? route('dashboard') : route('login')" class="rounded-lg px-3 py-3 hover:bg-white">{{ $page.props.auth?.user ? 'Dashboard' : 'Login organizer' }}</Link>
+                    </nav>
+                    <form class="mx-auto mt-3 flex max-w-6xl gap-2" role="search" @submit.prevent="submitSearch">
+                        <label for="public-search" class="sr-only">Cari event</label>
+                        <input id="public-search" v-model="search" type="search" placeholder="Cari event atau kota..." class="arc-input min-w-0 flex-1" />
+                        <button type="submit" class="arc-button px-5">Cari</button>
+                    </form>
+                </div>
             </div>
         </header>
-        <main class="flex-1"><slot /></main>
-        <footer class="mt-20 border-t border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-                <span class="font-black text-[var(--brand-ink)]">Ticket Event</span>
-                <span>Pesan tiket tanpa akun. Datang dengan tenang.</span>
-            </div>
-        </footer>
+        <main id="main-content" class="min-w-0 flex-1"><slot /></main>
     </div>
 </template>

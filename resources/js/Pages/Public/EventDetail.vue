@@ -1,195 +1,60 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import EventPoster from '@/Components/EventPoster.vue';
+import PublicIcon from '@/Components/PublicIcon.vue';
 import { Head, Link } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({ event: { type: Object, required: true } });
-
 const activeTab = ref('deskripsi');
-const activeTabDesktop = ref('deskripsi');
-
+const availableTickets = computed(() => props.event.ticket_types.filter((ticket) => ticket.remaining_quota > 0));
+const lowestPrice = computed(() => availableTickets.value.length ? Math.min(...availableTickets.value.map((ticket) => Number(ticket.price))) : null);
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(value));
-
-const formatDate = (value) => new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(new Date(value));
-const formatDateMobile = (value) => new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(new Date(value));
-
-const formatTime = (value) => {
-    const time = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).format(new Date(value));
-    return `${time.replace('.', ':')} WIB`;
-};
-
-const lowestPrice = computed(() => {
-    if (!props.event.ticket_types || props.event.ticket_types.length === 0) return 0;
-    return Math.min(...props.event.ticket_types.map(t => t.price));
-});
+const formatDate = (value) => value ? new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(new Date(value)) : 'Tanggal akan diumumkan';
+const formatTime = (value) => value ? new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).format(new Date(value)).replace('.', ':') + ' WIB' : 'Jam akan diumumkan';
 </script>
 
 <template>
     <Head :title="event.title" />
-    
     <PublicLayout>
-        
-        <!-- ========================================== -->
-        <!-- TAMPILAN MOBILE (Hanya muncul di layar HP) -->
-        <!-- ========================================== -->
-        <div class="block lg:hidden bg-[#10489d] min-h-screen relative font-sans">
-            
-            <!-- Navbar Mobile (ARC) -->
-            <div class="bg-white flex justify-between items-center p-4 sticky top-0 z-40 shadow-sm">
-                <div class="text-[#10489d] text-2xl font-black italic tracking-tighter">ARC</div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-[#10489d]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
-            </div>
-
-            <!-- Banner -->
-            <div class="w-full aspect-[4/3] bg-cover bg-center" :style="event.banner_url ? { backgroundImage: `url(${event.banner_url})` } : { backgroundColor: '#263246' }"></div>
-
-            <!-- Info Event -->
-            <div class="p-5 pb-4">
-                <span class="bg-white text-[#10489d] px-3 py-1 rounded-full text-[11px] font-bold tracking-wide">Workshop</span>
-                <h1 class="text-white text-xl font-bold mt-3 leading-snug">{{ event.title }}</h1>
-                
-                <div class="mt-4 space-y-2.5">
-                    <div class="flex items-center text-white text-sm">
-                        <svg class="w-5 h-5 mr-3 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        {{ formatDateMobile(event.start_at) }}
-                    </div>
-                    <div class="flex items-center text-white text-sm">
-                        <svg class="w-5 h-5 mr-3 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ formatTime(event.start_at) }}
-                    </div>
-                    <div class="flex items-start text-white text-sm">
-                        <svg class="w-5 h-5 mr-3 opacity-90 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span>{{ event.location_name }}<br><span class="text-xs opacity-75">{{ event.location_address }}</span></span>
-                    </div>
-                </div>
-
-                <div class="mt-5">
-                    <p class="text-white font-semibold text-[13px] mb-1.5">Penyelenggara</p>
-                    <div class="bg-white text-[#10489d] px-4 py-1.5 rounded-full text-xs font-bold inline-block shadow-sm">
-                        {{ event.organizer_name || 'FOKPA × MC KARAWANG BERSATU' }}
-                    </div>
-                </div>
-
-                <!-- Tab Mobile -->
-                <div class="flex mt-8">
-                    <button @click="activeTab = 'deskripsi'" :class="['pb-2 text-sm w-1/2 text-center transition-all', activeTab === 'deskripsi' ? 'text-white font-bold border-b-2 border-white' : 'text-blue-300 border-b border-transparent']">Deskripsi</button>
-                    <button @click="activeTab = 'syarat'" :class="['pb-2 text-sm w-1/2 text-center transition-all', activeTab === 'syarat' ? 'text-white font-bold border-b-2 border-white' : 'text-blue-300 border-b border-transparent']">Syarat & Ketentuan</button>
-                </div>
-            </div>
-
-            <!-- Konten Tab Mobile -->
-            <div class="bg-[#f0f4f9] rounded-t-2xl p-6 min-h-[50vh] pb-32">
-                <div v-if="activeTab === 'deskripsi'">
-                    <h2 class="text-xl font-extrabold text-gray-900 border-b-[2.5px] border-gray-900 inline-block pb-0.5 mb-4">Deskripsi</h2>
-                    <div class="text-sm text-gray-800 leading-relaxed whitespace-pre-line font-medium">{{ event.description }}</div>
-                </div>
-                <div v-if="activeTab === 'syarat'">
-                    <h2 class="text-xl font-extrabold text-gray-900 border-b-[2.5px] border-gray-900 inline-block pb-0.5 mb-4">Syarat & Ketentuan</h2>
-                    <ul class="list-disc list-inside text-sm text-gray-800 leading-relaxed font-medium space-y-2">
-                        <li>Tiket resmi hanya dijual melalui situs resmi.</li>
-                        <li>Tiket yang sudah dibeli tidak dapat dikembalikan.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Floating Bottom Bar Mobile -->
-            <div class="fixed bottom-0 w-full bg-white rounded-t-[20px] shadow-[0_-8px_20px_rgba(0,0,0,0.1)] p-5 z-50">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-[13px] font-extrabold text-gray-700">Mulai dari</span>
-                    <span class="text-[#10489d] font-bold text-lg">{{ lowestPrice > 0 ? money(lowestPrice) : 'Gratis' }}</span>
-                </div>
-                <Link v-if="event.ticket_types && event.ticket_types.length > 0" :href="route('public.events.checkout', event.slug)" class="block w-full bg-[#10489d] hover:bg-blue-800 text-white text-center py-3 rounded-full font-bold shadow-md">
-                    Pesan Sekarang
-                </Link>
-                <button v-else disabled class="block w-full bg-gray-300 text-gray-500 text-center py-3 rounded-full font-bold cursor-not-allowed">Tiket Belum Tersedia</button>
-            </div>
-        </div>
-
-
-        <!-- ========================================== -->
-        <!-- TAMPILAN DESKTOP (Hanya muncul di layar PC)-->
-        <!-- ========================================== -->
-        <div class="hidden lg:block max-w-6xl mx-auto px-8 py-12 font-sans">
-            <div class="grid grid-cols-12 gap-16">
-                
-                <!-- KOLOM KIRI DESKTOP -->
-                <div class="col-span-7">
-                    <span class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-xs font-bold flex items-center w-max gap-1.5">Workshop</span>
-                    <h1 class="text-4xl font-bold mt-5 text-gray-900 leading-tight">{{ event.title }}</h1>
-
-                    <div class="mt-6 mb-8">
-                        <p class="text-gray-500 text-sm mb-3">Penyelenggara</p>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                {{ event.organizer_name ? event.organizer_name.charAt(0) : 'P' }}
-                            </div>
-                            <span class="font-semibold text-gray-900 text-sm">{{ event.organizer_name || 'Penyelenggara Event' }}</span>
+        <div class="mx-auto max-w-5xl pb-32 md:px-8 md:py-8">
+            <div class="grid min-w-0 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-start md:gap-8">
+                <div class="min-w-0 md:sticky md:top-24">
+                    <EventPoster :event="event" class="md:rounded-2xl" />
+                    <div class="px-5 pb-5 pt-4 text-white md:px-0 md:pt-6">
+                        <span v-if="event.category" class="arc-badge">{{ event.category }}</span>
+                        <h1 class="mt-2 text-xl font-bold leading-relaxed md:text-2xl">{{ event.title }}</h1>
+                        <div class="mt-5 grid gap-3 text-sm">
+                            <p class="flex items-start gap-3"><PublicIcon name="calendar" class="h-5 w-5 shrink-0" /><span>{{ formatDate(event.start_at) }}</span></p>
+                            <p class="flex items-start gap-3"><PublicIcon name="clock" class="h-5 w-5 shrink-0" /><span>{{ formatTime(event.start_at) }}<span v-if="event.end_at"> – {{ formatTime(event.end_at) }}</span></span></p>
+                            <p class="flex items-start gap-3"><PublicIcon name="pin" class="h-5 w-5 shrink-0" /><span>{{ event.location_name || 'Lokasi akan diumumkan' }}<span v-if="event.location_address" class="mt-1 block text-xs leading-5 text-blue-100">{{ event.location_address }}</span></span></p>
                         </div>
-                    </div>
-
-                    <!-- Tab Desktop -->
-                    <div class="flex gap-6 mt-10 border-b border-gray-200">
-                        <button @click="activeTabDesktop = 'deskripsi'" :class="['pb-4 font-semibold text-sm relative', activeTabDesktop === 'deskripsi' ? 'text-gray-900' : 'text-gray-500']">
-                            Deskripsi <span v-if="activeTabDesktop === 'deskripsi'" class="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600"></span>
-                        </button>
-                        <button @click="activeTabDesktop = 'syarat'" :class="['pb-4 font-semibold text-sm relative', activeTabDesktop === 'syarat' ? 'text-gray-900' : 'text-gray-500']">
-                            Syarat & Ketentuan <span v-if="activeTabDesktop === 'syarat'" class="absolute bottom-0 left-0 w-full h-[2px] bg-blue-600"></span>
-                        </button>
-                    </div>
-
-                    <div class="mt-8">
-                        <div v-if="activeTabDesktop === 'deskripsi'">
-                            <h3 class="text-xl font-bold mb-4 text-gray-900">Deskripsi</h3>
-                            <div class="text-gray-600 leading-relaxed whitespace-pre-line">{{ event.description }}</div>
-                        </div>
-                        <div v-if="activeTabDesktop === 'syarat'">
-                            <h3 class="text-xl font-bold mb-4 text-gray-900">Syarat & Ketentuan</h3>
-                            <ul class="list-disc list-inside text-gray-600 leading-relaxed space-y-3">
-                                <li>Tiket resmi hanya dijual melalui situs resmi.</li>
-                                <li>Tiket yang sudah dibeli tidak dapat dikembalikan.</li>
-                            </ul>
+                        <div class="mt-6">
+                            <p class="mb-2 text-sm font-semibold">Penyelenggara</p>
+                            <span v-if="event.organizer_name" class="arc-badge bg-[#d9dce2]">{{ event.organizer_name }}</span>
+                            <p v-else class="text-sm text-blue-100">{{ event.contact_email || event.contact_phone || 'Informasi penyelenggara belum tersedia.' }}</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- KOLOM KANAN DESKTOP -->
-                <div class="col-span-5">
-                    <div class="sticky top-24 space-y-8">
-                        <div class="w-full rounded-2xl overflow-hidden shadow-md">
-                            <div class="w-full aspect-[4/3] bg-cover bg-center" :style="event.banner_url ? { backgroundImage: `url(${event.banner_url})` } : { backgroundColor: '#1e293b' }"></div>
+                <div class="min-w-0 md:pt-1">
+                    <div role="tablist" aria-label="Informasi event" class="flex px-5 text-sm text-white md:px-0">
+                        <button id="description-tab" type="button" role="tab" :aria-selected="activeTab === 'deskripsi'" aria-controls="event-panel" :tabindex="activeTab === 'deskripsi' ? 0 : -1" class="flex-1 border-b-2 px-2 py-3" :class="activeTab === 'deskripsi' ? 'border-white font-bold' : 'border-transparent text-blue-100'" @click="activeTab = 'deskripsi'" @keydown.right="activeTab = 'syarat'; $event.currentTarget.nextElementSibling.focus()">Deskripsi</button>
+                        <button id="terms-tab" type="button" role="tab" :aria-selected="activeTab === 'syarat'" aria-controls="event-panel" :tabindex="activeTab === 'syarat' ? 0 : -1" class="flex-1 border-b-2 px-2 py-3" :class="activeTab === 'syarat' ? 'border-white font-bold' : 'border-transparent text-blue-100'" @click="activeTab = 'syarat'" @keydown.left="activeTab = 'deskripsi'; $event.currentTarget.previousElementSibling.focus()">Syarat &amp; Ketentuan</button>
+                    </div>
+                    <section id="event-panel" role="tabpanel" :aria-labelledby="activeTab === 'deskripsi' ? 'description-tab' : 'terms-tab'" tabindex="0" class="min-h-56 rounded-t-2xl bg-white p-6 md:mt-0 md:rounded-2xl">
+                        <h2 class="mb-4 w-fit border-b-2 border-slate-900 text-xl font-bold">{{ activeTab === 'deskripsi' ? 'Deskripsi' : 'Syarat & Ketentuan' }}</h2>
+                        <div v-if="activeTab === 'deskripsi'" class="whitespace-pre-line text-sm leading-6">{{ event.description || 'Deskripsi event belum tersedia.' }}</div>
+                        <div v-else class="whitespace-pre-line text-sm leading-6">{{ event.terms || 'Syarat dan ketentuan belum ditambahkan. Silakan hubungi penyelenggara untuk informasi lebih lanjut.' }}</div>
+                    </section>
+                    <div class="arc-dock md:mt-5">
+                        <div class="mb-3 flex items-center justify-between gap-3 text-sm">
+                            <span>{{ lowestPrice !== null ? 'Mulai dari' : 'Ketersediaan tiket' }}</span>
+                            <span class="font-semibold text-[var(--arc-blue)]">{{ lowestPrice !== null ? (lowestPrice === 0 ? 'Gratis' : money(lowestPrice)) : 'Belum tersedia' }}</span>
                         </div>
-
-                        <div>
-                            <h3 class="text-lg font-bold mb-4 text-gray-900">Detail Acara</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center gap-4 text-gray-700 text-sm">
-                                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
-                                    <span class="font-medium">{{ formatDate(event.start_at) }}</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-gray-700 text-sm">
-                                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                                    <span class="font-medium">{{ formatTime(event.start_at) }} - Selesai</span>
-                                </div>
-                                <div class="flex items-start gap-4 text-gray-700 text-sm">
-                                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
-                                    <span class="font-medium leading-relaxed">{{ event.location_name }}<br><span class="text-gray-500 font-normal">{{ event.location_address }}</span></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-2xl p-6 flex flex-col xl:flex-row justify-between items-center gap-4">
-                            <div class="w-full xl:w-auto text-left">
-                                <p class="text-gray-500 text-sm mb-1">Harga mulai dari</p>
-                                <p class="text-xl font-bold text-gray-900">{{ lowestPrice > 0 ? money(lowestPrice) : 'Gratis' }}</p>
-                            </div>
-                            <Link v-if="event.ticket_types && event.ticket_types.length > 0" :href="route('public.events.checkout', event.slug)" class="w-full xl:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-center text-sm">
-                                Pesan Sekarang
-                            </Link>
-                            <button v-else disabled class="w-full xl:w-auto bg-gray-200 text-gray-500 font-bold py-3 px-8 rounded-lg text-center cursor-not-allowed text-sm">Belum Tersedia</button>
-                        </div>
+                        <Link v-if="availableTickets.length" :href="route('public.events.checkout', event.slug)" class="arc-button w-full">Pesan Sekarang</Link>
+                        <button v-else type="button" disabled class="arc-button w-full">Tiket belum tersedia</button>
                     </div>
                 </div>
-
             </div>
         </div>
     </PublicLayout>

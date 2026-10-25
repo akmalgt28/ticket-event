@@ -6,6 +6,7 @@ use App\Mail\EticketMail;
 use App\Models\AuditLog;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -160,5 +161,69 @@ class PaymentFlowTest extends TestCase
         $this->postJson('/api/orders/999999/payments/manual', [
             'method' => 'bank_transfer',
         ])->assertTooManyRequests();
+    }
+
+    public function test_selecting_manual_transfer_twice_reuses_the_pending_payment(): void
+    {
+        $order = Order::factory()->create();
+        $payload = ['method' => 'bank_transfer', 'customer_email' => $order->customer_email];
+        $first = $this->postJson('/api/orders/'.$order->id.'/payments/manual', $payload)->assertCreated();
+        $second = $this->postJson('/api/orders/'.$order->id.'/payments/manual', $payload)->assertCreated();
+
+        $this->assertSame($first->json('data.id'), $second->json('data.id'));
+        $this->assertDatabaseCount('payments', 1);
+    }
+
+    public function test_retrying_failed_payment_resets_order_payment_status(): void
+    {
+        $order = Order::factory()->create(['payment_status' => 'failed']);
+        Payment::factory()->for($order)->create(['status' => 'failed']);
+
+        $this->postJson('/api/orders/'.$order->id.'/payments/manual', [
+            'method' => 'bank_transfer', 'customer_email' => $order->customer_email,
+        ])->assertCreated()->assertJsonPath('data.status', 'pending');
+
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'pending']);
+        $this->assertSame(2, $order->payments()->count());
+    }
+
+    public function test_pending_payment_cannot_be_verified_after_deadline_or_cancellation(): void
+    {
+        Mail::fake();
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $this->actingAs($admin);
+
+        foreach ([['expires_at' => now()->subMinute()], ['order_status' => 'cancelled']] as $attributes) {
+            $order = Order::factory()->create($attributes);
+            Payment::factory()->for($order)->create(['status' => 'pending']);
+
+            $this->postJson('/payments/verify', ['order_id' => $order->id, 'status' => 'paid'])
+                ->assertUnprocessable()->assertJsonValidationErrors('order_id');
+            $this->assertDatabaseHas('payments', ['order_id' => $order->id, 'status' => 'pending']);
+            $this->assertNull($order->fresh()->paid_at);
+        }
+
+        $this->assertDatabaseCount('tickets', 0);
+        Mail::assertNothingQueued();
+    }
+
+    public function test_proof_upload_requires_matching_customer_and_valid_file(): void
+    {
+        Storage::fake('public');
+        $order = Order::factory()->create();
+        Payment::factory()->for($order)->create(['status' => 'pending']);
+        $url = '/api/orders/'.$order->id.'/payments/manual/proof';
+
+        $this->postJson($url, ['customer_email' => 'other@example.com', 'proof' => UploadedFile::fake()->image('proof.png')])
+            ->assertForbidden();
+        $this->postJson($url, ['customer_email' => $order->customer_email, 'proof' => UploadedFile::fake()->create('proof.txt', 1, 'text/plain')])
+            ->assertUnprocessable()->assertJsonValidationErrors('proof');
+        $this->postJson($url, ['customer_email' => $order->customer_email, 'proof' => UploadedFile::fake()->create('proof.pdf', 5121, 'application/pdf')])
+            ->assertUnprocessable()->assertJsonValidationErrors('proof');
+
+        $this->assertNull($order->payments()->first()->proof_path);
+        $this->assertSame([], Storage::disk('public')->allFiles('payment-proofs'));
     }
 }
