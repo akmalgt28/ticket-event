@@ -21,25 +21,71 @@ class PublicEventPageController extends Controller
 {
     public function index(Request $request): Response
     {
-        $events = Event::query()
-            ->where('status', EventStatus::Published)
-            ->when($request->filled('search'), function ($query) use ($request): void {
-                $search = trim((string) $request->query('search'));
+        $now = now();
+        $stringQuery = fn (string $key, int $length = 255): string => is_string($request->query($key))
+            ? mb_substr(trim($request->query($key)), 0, $length)
+            : '';
+        $filters = [
+            'search' => $stringQuery('search', 100),
+            'category' => $stringQuery('category', 100),
+            'location' => $stringQuery('location'),
+            'schedule' => in_array($request->query('schedule'), ['ongoing', 'upcoming'], true) ? $request->query('schedule') : 'all',
+        ];
 
+        $published = Event::query()->where('status', EventStatus::Published);
+        $configuredCategories = collect(config('ticket-event.events', []))
+            ->filter(fn ($details): bool => is_array($details) && is_string($details['category'] ?? null) && trim($details['category']) !== '')
+            ->map(fn ($details): string => trim($details['category']));
+        $publishedSlugs = (clone $published)->whereIn('slug', $configuredCategories->keys())->pluck('slug');
+        $categoriesBySlug = $configuredCategories->only($publishedSlugs->all());
+        $ticketTypes = ['ticketTypes' => fn ($query) => $query->where('status', TicketTypeStatus::Active)->availableForSale()->orderBy('price')];
+
+        $catalog = (clone $published)
+            ->when($filters['search'] !== '', function ($query) use ($filters): void {
+                $search = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], mb_strtolower($filters['search'])).'%';
                 $query->where(function ($query) use ($search): void {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('location_name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
+                    $query->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$search])
+                        ->orWhereRaw("LOWER(location_name) LIKE ? ESCAPE '!'", [$search]);
                 });
             })
-            ->with(['ticketTypes' => fn ($query) => $query->where('status', TicketTypeStatus::Active)->availableForSale()->orderBy('price')])
-            ->orderBy('start_at')
-            ->paginate(12)
-            ->withQueryString();
+            ->when($filters['category'] !== '', fn ($query) => $query->whereIn('slug', $categoriesBySlug->filter(fn ($category) => $category === $filters['category'])->keys()))
+            ->when($filters['location'] !== '', fn ($query) => $query->where('location_name', $filters['location']));
+
+        $ongoing = fn ($query) => $query->where('start_at', '<=', $now)->where('end_at', '>=', $now);
+        $upcoming = fn ($query) => $query->where('start_at', '>', $now);
+        $counts = [
+            'all' => (clone $catalog)->count(),
+            'ongoing' => $ongoing(clone $catalog)->count(),
+            'upcoming' => $upcoming(clone $catalog)->count(),
+        ];
+        $toCard = fn (Event $event): array => [
+            ...$this->eventData($event),
+            'schedule_status' => $event->start_at?->gt($now) ? 'upcoming'
+                : ($event->start_at && $event->end_at?->gte($now) ? 'ongoing' : 'ended'),
+        ];
+        $selection = clone $catalog;
+        if ($filters['schedule'] === 'ongoing') {
+            $ongoing($selection);
+        } elseif ($filters['schedule'] === 'upcoming') {
+            $upcoming($selection);
+        }
+        $events = $selection->with($ticketTypes)
+            ->orderByRaw('CASE WHEN end_at < ? THEN 1 ELSE 0 END', [$now])
+            ->orderBy('start_at')->orderBy('id')->paginate(12)
+            ->appends(array_filter($filters, fn ($value) => $value !== '' && $value !== 'all'));
+        $discover = $filters['search'] === '' && $filters['category'] === '' && $filters['location'] === '' && $filters['schedule'] === 'all' && $events->currentPage() === 1;
 
         return Inertia::render('Public/Events', [
-            'events' => $events->through(fn (Event $event): array => $this->eventData($event)),
-            'filters' => ['search' => (string) $request->query('search', '')],
+            'events' => $events->through($toCard),
+            'filters' => $filters,
+            'categories' => $categoriesBySlug->countBy()->sortKeys()->map(fn ($count, $name) => ['name' => $name, 'count' => $count])->values(),
+            'locations' => (clone $published)->whereNotNull('location_name')->where('location_name', '!=', '')->distinct()->orderBy('location_name')->pluck('location_name'),
+            'counts' => $counts,
+            'featuredEvents' => $discover ? (clone $published)->where('end_at', '>=', $now)
+                ->whereNotNull('banner_path')->where('banner_path', '!=', '')
+                ->with($ticketTypes)->orderBy('start_at')->orderBy('id')->limit(4)->get()->map($toCard) : [],
+            'ongoingEvents' => $discover ? $ongoing(clone $published)->with($ticketTypes)->orderBy('start_at')->orderBy('id')->limit(4)->get()->map($toCard) : [],
+            'upcomingEvents' => $discover ? $upcoming(clone $published)->with($ticketTypes)->orderBy('start_at')->orderBy('id')->limit(4)->get()->map($toCard) : [],
         ]);
     }
 
