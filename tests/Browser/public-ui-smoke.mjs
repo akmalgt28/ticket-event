@@ -9,6 +9,7 @@ import { resolve, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
+const catalogMode = process.argv.includes('--catalog');
 const output = resolve(root, 'storage/app/ui-review');
 await mkdir(output, { recursive: true });
 const manifest = JSON.parse(await readFile(resolve(root, 'public/build/manifest.json'), 'utf8'));
@@ -26,6 +27,31 @@ const event = {
     ],
 };
 const checkout = { order_number: 'ORD-UI-TEST', customer_email: 'buyer@example.test' };
+const catalogFixtures = [
+    { ...event, id: 101, slug: 'ongoing-test', title: 'Workshop Berlangsung — Data Pengujian', location_name: 'Bandung', schedule_status: 'ongoing', start_at: new Date(Date.now() - 3600000).toISOString() },
+    ...Array.from({ length: 14 }, (_, index) => ({ ...event, id: 102 + index, slug: 'catalog-test-' + index, title: 'Event Mendatang Pengujian ' + (index + 1), category: index % 2 ? 'Musik' : 'Workshop', location_name: index % 2 ? 'Jakarta' : 'Bandung', schedule_status: 'upcoming', start_at: new Date(Date.now() + (index + 1) * 86400000).toISOString() })),
+    { ...event, id: 199, slug: 'ended-test', title: 'Event Selesai Pengujian', schedule_status: 'ended', location_name: 'Jakarta' },
+];
+
+function catalogPage(url) {
+    const fixtures = url.searchParams.get('fixture') === 'empty' ? [] : catalogFixtures;
+    const filters = Object.fromEntries(['search', 'category', 'location', 'schedule'].map((key) => [key, url.searchParams.get(key) || (key === 'schedule' ? 'all' : '')]));
+    const matches = fixtures.filter((item) => (!filters.search || (item.title + ' ' + item.location_name).toLowerCase().includes(filters.search.toLowerCase())) && (!filters.category || item.category === filters.category) && (!filters.location || item.location_name === filters.location));
+    const counts = { all: matches.length, ongoing: matches.filter((item) => item.schedule_status === 'ongoing').length, upcoming: matches.filter((item) => item.schedule_status === 'upcoming').length };
+    const selected = matches.filter((item) => filters.schedule === 'all' || item.schedule_status === filters.schedule);
+    const page = Number(url.searchParams.get('page') || 1);
+    const last = Math.max(1, Math.ceil(selected.length / 12));
+    const pageUrl = (number) => { const params = new URLSearchParams(url.searchParams); params.set('page', number); return '/events?' + params; };
+    const discover = !filters.search && !filters.category && !filters.location && filters.schedule === 'all' && page === 1;
+    const categories = [...new Set(fixtures.map((item) => item.category))].sort().map((name) => ({ name, count: fixtures.filter((item) => item.category === name).length }));
+    return {
+        filters, counts, categories, locations: [...new Set(fixtures.map((item) => item.location_name))].sort(),
+        events: { data: selected.slice((page - 1) * 12, page * 12), total: selected.length, current_page: page, last_page: last, prev_page_url: page > 1 ? pageUrl(page - 1) : null, next_page_url: page < last ? pageUrl(page + 1) : null, links: Array.from({ length: last }, (_, index) => ({ label: String(index + 1), active: index + 1 === page, url: pageUrl(index + 1) })) },
+        featuredEvents: discover ? fixtures.filter((item) => item.schedule_status !== 'ended').slice(0, 3) : [],
+        ongoingEvents: discover ? fixtures.filter((item) => item.schedule_status === 'ongoing').slice(0, 4) : [],
+        upcomingEvents: discover ? fixtures.filter((item) => item.schedule_status === 'upcoming').slice(0, 4) : [],
+    };
+}
 const order = {
     id: 1, ...checkout, event, total_amount: '450000.00', order_status: 'pending', payment_status: 'pending',
     expires_at: new Date(Date.now() + 1800000).toISOString(),
@@ -84,7 +110,8 @@ const server = createServer(async (request, response) => {
         }
         let component;
         let props = { auth: { user: null }, errors: formErrors };
-        if (url.pathname.endsWith('/checkout')) component = 'Public/Checkout', props = { ...props, event, quantities: {} };
+        if (url.pathname === '/events') component = 'Public/Events', props = { ...props, ...catalogPage(url), auth: { user: url.searchParams.has('auth') ? { name: 'Test Organizer' } : null } };
+        else if (url.pathname.endsWith('/checkout')) component = 'Public/Checkout', props = { ...props, event, quantities: {} };
         else if (url.pathname.endsWith('/data-diri')) {
             component = 'Public/DataDiri';
             const quantity = Number(url.searchParams.get('qty[1]'));
@@ -136,16 +163,17 @@ try {
         pending.set(id, { resolve: (result) => { clearTimeout(timer); resolve(result); }, reject: (error) => { clearTimeout(timer); reject(error); } });
         websocket.send(JSON.stringify({ id, method, params }));
     });
-    const evaluate = async (expression) => { const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }); if (result.exceptionDetails) throw new Error(result.exceptionDetails.text); return result.result.value; };
+    const evaluate = async (expression) => { const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }); if (result.exceptionDetails) throw new Error((result.exceptionDetails.exception?.description || result.exceptionDetails.text) + '\nExpression: ' + expression); return result.result.value; };
     const until = async (expression) => {
         for (let attempt = 0; attempt < 100; attempt++) { if (await evaluate(expression)) return; await new Promise((resolve) => setTimeout(resolve, 50)); }
         throw new Error('UI did not reach expected state: ' + expression + '; exceptions: ' + errors.join('\n'));
     };
     const viewport = (width) => send('Emulation.setDeviceMetricsOverride', { width, height: 844, deviceScaleFactor: 1, mobile: width < 768 });
-    const clickText = (text) => evaluate(`Array.from(document.querySelectorAll('button,a')).find(el=>el.textContent.trim()===${JSON.stringify(text)}).click()`);
+    const clickText = (text) => evaluate(`Array.from(document.querySelectorAll('button,a')).find(el=>{const clone=el.cloneNode(true);clone.querySelectorAll('[aria-hidden="true"]').forEach(node=>node.remove());return clone.textContent.trim()===${JSON.stringify(text)}}).click()`);
     const labeledButton = (label) => `Array.from(document.querySelectorAll('button')).find(el=>el.getAttribute('aria-label')===${JSON.stringify(label)})`;
-    const screenshot = async (name) => {
-        await evaluate('window.scrollTo({top:0,behavior:"instant"});new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+    const screenshot = async (name, top = true) => {
+        if (top) await evaluate('window.scrollTo({top:0,behavior:"instant"})');
+        await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
         assert.equal(await evaluate('Math.round(document.querySelector("header").getBoundingClientRect().top)'), 0, 'Header should stay at the top');
         const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
         await writeFile(resolve(output, name + '.png'), Buffer.from(shot.data, 'base64'));
@@ -159,6 +187,49 @@ try {
         await viewport(390);
     };
     await send('Runtime.enable'); await send('Page.enable'); await viewport(390);
+    if (catalogMode) {
+        await send('Page.navigate', { url: base + '/events' });
+        await until('Boolean(document.querySelector("#catalog-search"))');
+        await responsive(); await screenshot('homepage-mobile');
+        await viewport(1280); await screenshot('homepage-desktop');
+        await evaluate('document.querySelector("#catalog").scrollIntoView({block:"start",behavior:"instant"})');
+        await screenshot('homepage-catalog-desktop', false);
+        assert.equal(await evaluate('document.querySelector("nav").textContent.includes("Beranda")'), true);
+        await evaluate(`${labeledButton('Event berikutnya')}.click()`);
+        await until('document.querySelector("section[aria-roledescription=carousel]").textContent.includes("Event Mendatang Pengujian 1")');
+        await evaluate(`${labeledButton('Event sebelumnya')}.click()`);
+        await viewport(390);
+        await evaluate('document.querySelector("button[aria-controls=public-menu]").click()');
+        await until('Boolean(document.querySelector("#public-menu"))');
+        await evaluate('window.__menuVisitFinished=false;document.addEventListener("inertia:finish",()=>window.__menuVisitFinished=true,{once:true})');
+        await evaluate('document.querySelector("#public-menu a").click()');
+        await until('window.__menuVisitFinished && !document.querySelector("#public-menu") && Boolean(document.querySelector("#catalog-search"))');
+        await evaluate('(()=>{const field=document.querySelector("#catalog-search");field.value="zz-no-event";field.dispatchEvent(new Event("input",{bubbles:true}));})()');
+        await clickText('Cari Event');
+        await until('document.body.textContent.includes("Belum menemukan event yang cocok?")');
+        await responsive(); await screenshot('homepage-empty-search');
+        await clickText('Lihat semua event');
+        await until('document.querySelector("#catalog-search").value === "" && document.body.textContent.includes("Event Sedang Berlangsung")');
+        await evaluate('(()=>{const category=document.querySelector("#catalog-category");category.value="Musik";category.dispatchEvent(new Event("change",{bubbles:true}));})()');
+        await until('new URL(location.href).searchParams.get("category")==="Musik"');
+        assert(await evaluate('Array.from(document.querySelectorAll("article h3")).every(el=>el.textContent.includes("Event Mendatang"))'));
+        await evaluate('(()=>{const locationField=document.querySelector("#catalog-location");locationField.value="Jakarta";locationField.dispatchEvent(new Event("change",{bubbles:true}));})()');
+        await until('new URL(location.href).searchParams.get("location")==="Jakarta"');
+        assert.equal(await evaluate('document.querySelector("#catalog-category").value'), 'Musik');
+        await clickText('Reset filter');
+        await until('document.querySelector("#catalog-category").value === "" && document.body.textContent.includes("Event Sedang Berlangsung")');
+        await evaluate(`document.querySelector('a[aria-label="Halaman berikutnya"]').click()`);
+        await until('new URL(location.href).searchParams.get("page")==="2"');
+        assert.equal(await evaluate('document.querySelectorAll("article").length'), 4);
+        await send('Page.navigate', { url: base + '/events?fixture=empty' });
+        await until('document.body.textContent.includes("Nantikan event berikutnya.")');
+        assert.equal(await evaluate('document.querySelectorAll("article").length'), 0);
+        await responsive(); await screenshot('homepage-no-events');
+        await send('Page.navigate', { url: base + '/events?auth=1' });
+        await until('document.body.textContent.includes("Dashboard")');
+        assert.equal(errors.length, 0, errors.join('\n'));
+        console.log(JSON.stringify({ result: 'passed', mode: 'catalog', widths: [320, 390, 768, 1280], checks: ['ARC header/auth navigation', 'mobile menu', 'featured carousel', 'search empty state', 'category/location combined filters', 'filter reset', 'pagination', 'no-event fallback', 'no horizontal overflow', 'no browser exceptions'], screenshots: output }));
+    } else {
     await send('Page.navigate', { url: base + '/events/ui-test' });
     await until("Boolean(document.querySelector('.public-site'))");
     assert.equal(await evaluate('document.querySelectorAll("header").length'), 1);
@@ -201,6 +272,7 @@ try {
     await responsive(); await screenshot('status-mobile');
     assert.equal(errors.length, 0, errors.join('\n'));
     console.log(JSON.stringify({ result: 'passed', widths: [320, 390, 768, 1280], checks: ['logo/header', 'hamburger', 'tabs', 'stock limits', 'reactive totals', 'buyer validation retention', 'checkout payload', 'bank account display', 'file validation', 'proof upload pending verification', 'status navigation', 'no horizontal overflow', 'no browser exceptions'], screenshots: output }));
+    }
     await send('Browser.close').catch(() => {});
 } finally {
     websocket?.close(); browser.kill(); server.close();
