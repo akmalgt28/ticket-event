@@ -1,0 +1,780 @@
+{
+ "url": "http://127.0.0.1:8000/events/event-ha15kv",
+ "at": "2026-10-26T11:17:40.039Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 941,
+     "screens": 1,
+     "words": 46,
+     "img": 2,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Event",
+     "words": 1,
+     "chars": 5,
+     "lines": 1,
+     "size": 20,
+     "vw": 1.4,
+     "font": "Inter Tight",
+     "weight": 700,
+     "tracking": 0.02,
+     "leading": 1.25,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.37,
+     "top": 600,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Event",
+     "words": 1,
+     "lines": 1,
+     "size": 20,
+     "font": "Inter Tight"
+    },
+    "headings": [],
+    "headingSummary": {
+     "count": 0,
+     "maxLines": 0,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Inter",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "Inter Tight",
+       "share": 0.05,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      14,
+      16,
+      20
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 20,
+      "vw": 1.4,
+      "font": "Inter Tight",
+      "text": "Event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.12,
+     "centerShare": 0.07,
+     "smallText": 4
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f7f4ee",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.36,
+      "l": 0.95
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#ffffff",
+       "top": 0,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#101014",
+       "share": 0.36
+      },
+      {
+       "color": "#64748b",
+       "share": 0.29
+      },
+      {
+       "color": "#0000ee",
+       "share": 0.14
+      },
+      {
+       "color": "#173c73",
+       "share": 0.08
+      },
+      {
+       "color": "#144ba3",
+       "share": 0.07
+      }
+     ],
+     "button": {
+      "bg": "#144ba3",
+      "hsl": {
+       "h": 217,
+       "s": 0.78,
+       "l": 0.36
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": [
+      {
+       "text": "Tiket belum tersedia",
+       "ratio": 4,
+       "need": 4.5,
+       "size": 14,
+       "fg": "#144ba3",
+       "bg": "#9bb7dc"
+      },
+      {
+       "text": "Ketersediaan tiket",
+       "ratio": 4.3,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#64748b",
+       "bg": "#eef5fc"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": "pill",
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Login ↗",
+      "Tiket belum tersedia"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 4,
+     "hairlineSamples": [
+      "header.sticky.top-0 1440px",
+      "div.mt-5.border-b 529px",
+      "div.border-t.border-[#dbe7f5] 529px",
+      "div.flex.border-b 647px"
+     ],
+     "outlinedBoxes": 3,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 1,
+     "mediaRadius": 8,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.16
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "inter",
+     "inter tight",
+     "font awesome 7 free"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 941,
+    "margins": {
+     "left": 112,
+     "right": 112
+    },
+    "sections": [],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Event",
+      "size": 20,
+      "top": 600,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 112,
+      "n": 1
+     },
+     {
+      "x": 714,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.25,
+    "voidBox": {
+     "x": 360,
+     "y": 600,
+     "w": 1080,
+     "h": 300
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 1169,
+     "screens": 1.4,
+     "words": 39,
+     "img": 2,
+     "video": 0,
+     "canvas": 0,
+     "svg": 0,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Event",
+     "words": 1,
+     "chars": 5,
+     "lines": 1,
+     "size": 20,
+     "vw": 5.1,
+     "font": "Inter Tight",
+     "weight": 700,
+     "tracking": 0.02,
+     "leading": 1.25,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.9,
+     "top": 450,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Event",
+     "words": 1,
+     "lines": 1,
+     "size": 20,
+     "font": "Inter Tight"
+    },
+    "headings": [],
+    "headingSummary": {
+     "count": 0,
+     "maxLines": 0,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Inter",
+       "share": 0.94,
+       "mono": false
+      },
+      {
+       "family": "Inter Tight",
+       "share": 0.06,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      14,
+      16,
+      20
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 20,
+      "vw": 5.1,
+      "font": "Inter Tight",
+      "text": "Event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.14,
+     "centerShare": 0.09,
+     "smallText": 4
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f7f4ee",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.36,
+      "l": 0.95
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#ffffff",
+       "top": 0,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#101014",
+       "share": 0.41
+      },
+      {
+       "color": "#64748b",
+       "share": 0.34
+      },
+      {
+       "color": "#0000ee",
+       "share": 0.17
+      },
+      {
+       "color": "#144ba3",
+       "share": 0.09
+      }
+     ],
+     "button": {
+      "bg": "#9bb7dc",
+      "hsl": {
+       "h": 214,
+       "s": 0.48,
+       "l": 0.74
+      },
+      "fg": "#144ba3"
+     },
+     "lowContrast": [
+      {
+       "text": "Tiket belum tersedia",
+       "ratio": 4,
+       "need": 4.5,
+       "size": 14,
+       "fg": "#144ba3",
+       "bg": "#9bb7dc"
+      },
+      {
+       "text": "Ketersediaan tiket",
+       "ratio": 4.3,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#64748b",
+       "bg": "#eef5fc"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": "pill",
+     "height": 40,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Tiket belum tersedia"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 4,
+     "hairlineSamples": [
+      "header.sticky.top-0 390px",
+      "div.mt-5.border-b 350px",
+      "div.border-t.border-[#dbe7f5] 350px",
+      "div.flex.border-b 350px"
+     ],
+     "outlinedBoxes": 3,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 1,
+     "mediaRadius": 8,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.28
+     }
+    ],
+    "nav": {
+     "links": 1,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "inter",
+     "inter tight",
+     "font awesome 7 free"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 1169,
+    "margins": {
+     "left": 20,
+     "right": 20
+    },
+    "sections": [
+     {
+      "sel": "section.min-w-0.lg:sticky",
+      "tag": "section",
+      "top": 137,
+      "height": 590,
+      "words": 19,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Event",
+       "size": 20,
+       "tag": "h1"
+      },
+      "left": 20,
+      "right": 21,
+      "textLeft": 20,
+      "textRight": 174,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.min-w-0.lg:pt-1",
+      "tag": "section",
+      "top": 750,
+      "height": 291,
+      "words": 7,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Deskripsi",
+       "size": 16,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 36,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Event",
+      "size": 20,
+      "top": 450,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 20,
+      "n": 1
+     },
+     {
+      "x": 45,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 2,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "FAIL",
+   "id": "hairline",
+   "width": 1440,
+   "message": "4 thin rule(s)/divider line(s): header.sticky.top-0 1440px | div.mt-5.border-b 529px | div.border-t.border-[#dbe7f5] 529px | div.flex.border-b 647px",
+   "fix": "Delete. Separate with space, a tone change, or scale. Lines are only for real tables and form fields.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "outlined-box",
+   "width": 1440,
+   "message": "3 boxes drawn with a 1px outline.",
+   "fix": "Define a surface by its fill (one tone step from the page) or leave the content unboxed.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (page background #f7f4ee).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "default-link",
+   "width": 1440,
+   "message": "Browser-default blue/purple link colour is showing.",
+   "fix": "Style every link: inherit the text colour and mark it with weight, underline offset, or the accent.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "contrast",
+   "width": 1440,
+   "message": "Low-contrast text: \"Tiket belum tersedia\" 4:1 needs 4.5:1; \"Ketersediaan tiket\" 4.3:1 needs 4.5:1",
+   "fix": "Darken or lighten the text colour.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "few-pictures",
+   "width": 1440,
+   "message": "Only 1 picture(s) on the page (1 photographs, footage or raster images, 0 interface fragments). Drawings in SVG do not count.",
+   "fix": "Find real pictures of the subject's world with scripts/assets.mjs (photographs, archival images, maps, engravings, footage), download them to assets/ and give them room: a hero picture, one per section that has a subject, a full-width band. At least four, usually six to twelve."
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "FAIL",
+   "id": "small-text",
+   "width": 1440,
+   "message": "4 text blocks under 13px.",
+   "fix": "Nothing meant to be read goes below 13px.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "focal-point",
+   "width": 1440,
+   "message": "The first screen has no dominant element: the largest type is 20px (1.4vw) and no single picture holds a third of the viewport.",
+   "fix": "Make one thing lead: the headline at display size, or one large picture. A grid of many small pictures is not one thing; in blind tests jurors marked a first screen without a headline down every time. On the strongest studied sites the largest type has a median of 8.4vw."
+  },
+  {
+   "level": "WARN",
+   "id": "small-title",
+   "width": 1440,
+   "message": "The h1 is 20px (\"Event\").",
+   "fix": "Set the title at display size, or make the large text of the first screen the h1.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "name-only-title",
+   "width": 1440,
+   "message": "The h1 is a bare name (\"Event\") and nothing else on the first screen says what this is.",
+   "fix": "Keep the name if it leads, and give the line under it (18px or more) the plain words: what it is, for whom, where or when. In the study of 97 Sites of the Day, first screens that named nothing lost usability and content points.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Only 0 element(s) moved while the page loaded and scrolled.",
+   "fix": "Build the motion layer (SKILL.md step 9, references/motion.md): the signature move, an entrance for the parts of every section, feedback on every control, and one moving picture. Transform and opacity only, with a reduced-motion fallback."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\FP\\Ticket Event\\.taste-skill\\event-cover-final\\desktop-fold.jpg",
+   "pages": [
+    "D:\\FP\\Ticket Event\\.taste-skill\\event-cover-final\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\FP\\Ticket Event\\.taste-skill\\event-cover-final\\mobile-fold.jpg",
+   "pages": [
+    "D:\\FP\\Ticket Event\\.taste-skill\\event-cover-final\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

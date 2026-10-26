@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -21,6 +22,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
+        abort_if(app()->isProduction() && User::query()->exists(), 404);
+
         return Inertia::render('Auth/Register');
     }
 
@@ -31,6 +34,8 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_if(app()->isProduction() && User::query()->exists(), 404);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
@@ -42,6 +47,10 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        if (User::query()->count() === 1 && Role::query()->where('name', 'owner')->where('guard_name', 'web')->exists()) {
+            $user->assignRole('owner');
+        }
 
         event(new Registered($user));
 

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Ticket;
 use App\Models\TicketType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -34,6 +35,29 @@ class PublicOrderStatusTest extends TestCase
             ->assertJsonPath('data.payment_status', 'paid')
             ->assertJsonPath('data.payment.status', 'paid')
             ->assertJsonMissingPath('data.customer_email');
+    }
+
+    public function test_paid_order_status_includes_ticket_qr_without_exposing_token(): void
+    {
+        $order = Order::factory()->create([
+            'customer_email' => 'buyer@example.com',
+            'payment_status' => 'paid',
+            'order_status' => 'paid',
+        ]);
+        $ticket = Ticket::factory()->for($order)->create([
+            'qr_token' => 'private-qr-token',
+        ]);
+
+        $this->postJson('/api/orders/status', [
+            'order_number' => $order->order_number,
+            'customer_email' => $order->customer_email,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.tickets.0.ticket_number', $ticket->ticket_number)
+            ->assertJsonPath('data.tickets.0.attendee_name', 'Peserta')
+            ->assertJsonPath('data.tickets.0.status', 'issued')
+            ->assertJsonStructure(['data' => ['tickets' => [['qr_svg']]]])
+            ->assertJsonMissingPath('data.tickets.0.qr_token');
     }
 
     public function test_guest_cannot_lookup_order_with_wrong_email(): void

@@ -55,7 +55,7 @@ class PaymentService
 
     public function uploadManualProof(Order $order, UploadedFile $proof): Payment
     {
-        $path = $proof->store('payment-proofs', 'public');
+        $path = $proof->store('payment-proofs', 'local');
 
         try {
             return DB::transaction(function () use ($order, $path): Payment {
@@ -86,13 +86,13 @@ class PaymentService
                 ]);
 
                 if ($oldPath && $oldPath !== $path) {
-                    Storage::disk('public')->delete($oldPath);
+                    Storage::disk('local')->delete($oldPath);
                 }
 
                 return $payment->fresh();
             });
         } catch (Throwable $exception) {
-            Storage::disk('public')->delete($path);
+            Storage::disk('local')->delete($path);
 
             throw $exception;
         }

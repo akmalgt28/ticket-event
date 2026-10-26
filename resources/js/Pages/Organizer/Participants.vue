@@ -21,19 +21,19 @@ function search() {
         <template #header>
             <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-[0.28em] text-amber-600">Operations</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.28em] text-[var(--brand-primary)]">Operations</p>
                     <h2 class="mt-1 text-2xl font-black tracking-tight text-slate-900">Daftar peserta</h2>
                 </div>
-                <a :href="route('organizer.participants.export', { search: filters.search })" class="rounded-xl bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-600">Download CSV</a>
+                <a :href="route('organizer.participants.export', { search: filters.search })" class="rounded-xl bg-slate-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-[var(--brand-primary)]">Download CSV</a>
             </div>
         </template>
 
-        <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
+        <div class="min-h-[calc(100vh-9rem)] bg-[#f4f7fb] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl space-y-6">
                 <section class="rounded-3xl border border-slate-200/80 bg-white p-5">
                     <form class="flex flex-col gap-3 sm:flex-row" @submit.prevent="search">
-                        <input v-model="filterForm.search" type="search" placeholder="Cari nama, email, nomor order..." class="min-w-0 flex-1 rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400" />
-                        <button type="submit" class="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-amber-600">Cari peserta</button>
+                        <input v-model="filterForm.search" type="search" placeholder="Cari nama, email, nomor order..." class="min-w-0 flex-1 rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" />
+                        <button type="submit" class="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-[var(--brand-primary)]">Cari peserta</button>
                     </form>
                 </section>
 
@@ -48,7 +48,7 @@ function search() {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                <tr v-for="participant in participants.data" :key="participant.id" class="transition hover:bg-amber-50/40">
+                                <tr v-for="participant in participants.data" :key="participant.id" class="transition hover:bg-slate-50/40">
                                     <td class="px-5 py-4 font-bold text-slate-900">{{ participant.name }}</td>
                                     <td class="px-5 py-4"><p class="text-slate-700">{{ participant.email }}</p><p class="text-xs text-slate-500">{{ participant.phone }}</p></td>
                                     <td class="px-5 py-4 font-semibold text-slate-600">{{ participant.order_number || '-' }}</td>

@@ -50,7 +50,7 @@ class PaymentFlowTest extends TestCase
 
     public function test_customer_can_upload_manual_payment_proof(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $order = Order::factory()->create();
 
         $this->postJson('/api/orders/'.$order->id.'/payments/manual', [
@@ -63,10 +63,10 @@ class PaymentFlowTest extends TestCase
             'proof' => UploadedFile::fake()->image('receipt.jpg'),
         ]);
 
-        $response->assertOk()->assertJsonPath('data.status', 'pending');
+        $response->assertOk()->assertJsonPath('data.status', 'pending')->assertJsonPath('data.proof_url', null);
         $payment = $order->payments()->firstOrFail();
         $this->assertNotNull($payment->proof_path);
-        Storage::disk('public')->assertExists($payment->proof_path);
+        Storage::disk('local')->assertExists($payment->proof_path);
     }
 
     public function test_admin_can_verify_manual_payment_and_order_is_marked_paid(): void
@@ -211,7 +211,7 @@ class PaymentFlowTest extends TestCase
 
     public function test_proof_upload_requires_matching_customer_and_valid_file(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $order = Order::factory()->create();
         Payment::factory()->for($order)->create(['status' => 'pending']);
         $url = '/api/orders/'.$order->id.'/payments/manual/proof';
@@ -224,6 +224,6 @@ class PaymentFlowTest extends TestCase
             ->assertUnprocessable()->assertJsonValidationErrors('proof');
 
         $this->assertNull($order->payments()->first()->proof_path);
-        $this->assertSame([], Storage::disk('public')->allFiles('payment-proofs'));
+        $this->assertSame([], Storage::disk('local')->allFiles('payment-proofs'));
     }
 }

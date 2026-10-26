@@ -57,35 +57,35 @@ function verifyPayment(orderId) {
         <template #header>
             <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-[0.28em] text-amber-600">Operations</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.28em] text-[var(--brand-primary)]">Operations</p>
                     <h2 class="mt-1 text-2xl font-black tracking-tight text-slate-900">{{ filters.payment_status === 'pending' ? 'Verifikasi pembayaran' : 'Daftar order' }}</h2>
                 </div>
-                <a :href="route('organizer.participants.export')" class="text-sm font-bold text-slate-900 underline decoration-amber-400 decoration-2 underline-offset-4">Export peserta CSV</a>
+                <a :href="route('organizer.participants.export')" class="text-sm font-bold text-slate-900 underline decoration-[var(--brand-primary)] decoration-2 underline-offset-4">Export peserta CSV</a>
             </div>
         </template>
 
-        <div class="min-h-[calc(100vh-9rem)] bg-[#f7f3ec] px-4 py-8 sm:px-6 lg:px-8">
+        <div class="min-h-[calc(100vh-9rem)] bg-[#f4f7fb] px-4 py-8 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-7xl space-y-6">
                 <div v-if="verificationForm.hasErrors" role="alert" class="rounded-2xl bg-rose-50 p-4 text-sm text-rose-700">
                     <p v-for="(error, key) in verificationForm.errors" :key="key">{{ error }}</p>
                 </div>
                 <section class="rounded-3xl border border-slate-200/80 bg-white p-5">
                     <form class="grid gap-3 md:grid-cols-[1fr_180px_180px_auto]" @submit.prevent="search">
-                        <input v-model="filterForm.search" type="search" placeholder="Cari nomor, nama, email..." class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400" />
-                        <select v-model="filterForm.status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400">
+                        <input v-model="filterForm.search" type="search" placeholder="Cari nomor, nama, email..." class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" />
+                        <select v-model="filterForm.status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]">
                             <option value="">Semua order</option>
                             <option value="pending">Pending</option>
                             <option value="paid">Paid</option>
                             <option value="expired">Expired</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
-                        <select v-model="filterForm.payment_status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-amber-400 focus:ring-amber-400">
+                        <select v-model="filterForm.payment_status" class="rounded-2xl border-slate-200 px-4 py-3 text-sm focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]">
                             <option value="">Semua payment</option>
                             <option value="pending">Pending</option>
                             <option value="paid">Paid</option>
                             <option value="failed">Failed</option>
                         </select>
-                        <button type="submit" class="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-amber-600">Cari</button>
+                        <button type="submit" class="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-[var(--brand-primary)]">Cari</button>
                     </form>
                 </section>
 
@@ -103,16 +103,16 @@ function verifyPayment(orderId) {
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                <tr v-for="order in orders.data" :key="order.id" class="transition hover:bg-amber-50/40">
+                                <tr v-for="order in orders.data" :key="order.id" class="transition hover:bg-slate-50/40">
                                     <td class="whitespace-nowrap px-5 py-4 font-black text-slate-900">{{ order.order_number }}</td>
                                     <td class="px-5 py-4"><p class="font-semibold text-slate-800">{{ order.customer_name }}</p><p class="text-xs text-slate-500">{{ order.customer_email }}</p></td>
                                     <td class="px-5 py-4 text-slate-600">{{ order.event || '-' }}</td>
                                     <td class="whitespace-nowrap px-5 py-4 font-semibold text-slate-800">{{ formatCurrency(order.total_amount) }}</td>
                                     <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ statusLabel(order.payment_status) }}</span></td>
                                     <td class="whitespace-nowrap px-5 py-4">
-                                        <a v-if="order.payment?.proof_url" :href="order.payment.proof_url" target="_blank" rel="noopener noreferrer" class="mr-3 text-xs font-bold text-sky-700 underline">Lihat bukti transfer</a>
+                                        <a v-if="order.payment?.proof_url" :href="order.payment.proof_url" target="_blank" rel="noopener noreferrer" class="mr-3 text-xs font-bold text-[var(--brand-primary)] underline">Lihat bukti transfer</a>
                                         <button v-if="order.payment_status === 'pending' && order.payment" type="button" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700" :disabled="verificationForm.processing" @click="verifyPayment(order.id)">Verifikasi paid</button>
-                                        <button v-else-if="order.payment_status === 'paid' && order.tickets_count > 0" type="button" class="rounded-xl bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700" :disabled="resendForm.processing" @click="resendEticket(order.id)">{{ resendForm.processing ? 'Mengirim...' : 'Kirim ulang e-ticket' }}</button>
+                                        <button v-else-if="order.payment_status === 'paid' && order.tickets_count > 0" type="button" class="rounded-xl bg-[var(--brand-primary)] px-3 py-2 text-xs font-bold text-white hover:bg-[var(--brand-primary-dark)]" :disabled="resendForm.processing" @click="resendEticket(order.id)">{{ resendForm.processing ? 'Mengirim...' : 'Kirim ulang e-ticket' }}</button>
                                         <span v-else class="text-xs text-slate-400">Tidak ada aksi</span>
                                     </td>
                                 </tr>

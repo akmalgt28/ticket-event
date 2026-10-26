@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-    --brand-primary: #d95d39;
-    --brand-primary-dark: #b74327;
-    --brand-ink: #172033;
-    --brand-paper: #f7f4ee;
-    --brand-muted: #667085;
+    --brand-primary: #144ba3;
+    --brand-primary-dark: #0e397e;
+    --brand-ink: #122b53;
+    --brand-paper: #f4f7fb;
+    --brand-muted: #64748b;
     --ui-radius: 6px;
 }
 
@@ -18,7 +18,7 @@ html, body {
 body {
     margin: 0;
     color: var(--brand-ink);
-    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 *:not(.public-site, .public-site *), *:not(.public-site, .public-site *)::before, *:not(.public-site, .public-site *)::after {
@@ -52,21 +52,123 @@ body {
 .brand-focus:focus { border-color: var(--brand-primary); outline: 2px solid color-mix(in srgb, var(--brand-primary) 25%, transparent); outline-offset: 1px; }
 
 .public-site {
-    --arc-blue: #144ba3;
-    --arc-sky: #e3f3ff;
-    --brand-primary: #144ba3;
-    --brand-primary-dark: #0e397e;
-    --brand-paper: #e3f3ff;
-    --brand-ink: #102c57;
+    --arc-blue: var(--brand-primary);
+    --arc-sky: #f8fafc;
     overflow-wrap: anywhere;
-    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
+
+.type-title-lg {
+        font-family: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: 0.4px;
+    }
+
+.type-title-md {
+        font-family: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: 0.32px;
+    }
+
+.type-body-md {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.65;
+        letter-spacing: 0;
+    }
+
+.type-body-sm {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.4;
+        letter-spacing: 0.28px;
+    }
+
+.type-body-sm-strong {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: 0.28px;
+    }
+
+.type-body-sm-relaxed {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.65;
+        letter-spacing: 0.28px;
+    }
+
+.type-caption-md {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.5;
+        letter-spacing: 0.24px;
+    }
+
+.type-caption-strong {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.5;
+        letter-spacing: 0.24px;
+    }
+
+.type-caption-eyebrow {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.33;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+.type-caption-eyebrow-tight {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+.type-meta-sm {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.43;
+        letter-spacing: 0.2px;
+    }
+
+.public-site [class*='rounded-xl'],
+.public-site [class*='rounded-2xl'] {
+    border-radius: var(--ui-radius) !important;
+}
+
+.public-site,
+.admin-shell {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+.admin-shell button.bg-slate-950,
+.admin-shell a.bg-slate-950 {
+    background-color: var(--brand-primary) !important;
+}
+.order-lookup { width: min(100%, 42rem); }
 
 @layer components {
     .arc-card { @apply rounded-2xl bg-white p-5 text-slate-950 sm:p-6; }
     .arc-badge { @apply inline-flex max-w-full items-center rounded-full bg-white px-4 py-1 text-xs font-semibold text-[var(--arc-blue)]; }
-    .arc-button { @apply inline-flex min-h-10 items-center justify-center rounded-full bg-[var(--arc-blue)] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#0e397e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50; }
-    .arc-input { @apply block w-full rounded-lg border border-blue-400 bg-white px-3 py-2 text-base text-slate-950 focus:border-blue-700 focus:ring-1 focus:ring-blue-700; }
+    .arc-button { @apply inline-flex min-h-10 items-center justify-center rounded-full bg-[var(--arc-blue)] px-6 py-2 text-sm font-semibold text-white transition hover:bg-[var(--brand-primary-dark)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-primary)] disabled:cursor-not-allowed disabled:opacity-50; }
+    .arc-input { @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-950 focus:border-[var(--brand-primary)] focus:ring-1 focus:ring-[var(--brand-primary)]; }
     .arc-dock { @apply fixed inset-x-0 bottom-0 z-30 rounded-t-2xl bg-[var(--arc-sky)] px-5 pt-4 text-slate-950 md:static md:rounded-2xl md:p-5; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 }
 

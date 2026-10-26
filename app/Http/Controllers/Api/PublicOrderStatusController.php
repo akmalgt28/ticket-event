@@ -21,7 +21,11 @@ class PublicOrderStatusController extends Controller
         abort_if($order === null, 404, 'Order tidak ditemukan.');
 
         $expiration->expire($order);
-        $order->refresh()->load(['payments' => fn ($query) => $query->latest('id'), 'event']);
+        $order->refresh()->load([
+            'payments' => fn ($query) => $query->latest('id'),
+            'event',
+            'tickets.attendee:id,name',
+        ]);
 
         return (new PublicOrderStatusResource($order))->response();
     }

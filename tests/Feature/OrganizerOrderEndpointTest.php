@@ -136,7 +136,7 @@ class OrganizerOrderEndpointTest extends TestCase
         $this->actingAs($admin)->get('/organizer/orders')->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('orders.data.0.payment.status', 'pending')
-                ->where('orders.data.0.payment.proof_url', fn ($url) => str_ends_with($url, '/payment-proofs/latest.png')));
+                ->where('orders.data.0.payment.proof_url', fn ($url) => str_ends_with($url, '/organizer/payments/'.$order->payments()->latest('id')->value('id').'/proof')));
     }
 
     public function test_admin_can_open_participants_inertia_page(): void

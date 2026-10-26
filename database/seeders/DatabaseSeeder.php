@@ -36,6 +36,10 @@ class DatabaseSeeder extends Seeder
         $adminRole->syncPermissions($permissions->except('checkin.manage')->values());
         $staffRole->syncPermissions([$permissions['checkin.manage']]);
 
+        if (app()->isProduction()) {
+            return;
+        }
+
         $owner = User::query()->where('email', 'test@example.com')->first()
             ?? User::factory()->create([
                 'name' => 'Event Owner',

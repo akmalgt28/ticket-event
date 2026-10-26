@@ -1,0 +1,1465 @@
+{
+ "url": "http://127.0.0.1:8000/events",
+ "at": "2026-10-26T09:20:51.677Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    1,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 2252,
+     "screens": 2.5,
+     "words": 158,
+     "img": 5,
+     "video": 0,
+     "canvas": 0,
+     "svg": 13,
+     "sections": 4,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "GEqJIzqzgyvD5Cytq0AZGBWcZ5eP0nJ4dy2Gfds5.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Event",
+     "words": 1,
+     "chars": 5,
+     "lines": 1,
+     "size": 30,
+     "vw": 2.1,
+     "font": "Figtree",
+     "weight": 700,
+     "tracking": -0.025,
+     "leading": 1.2,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.33,
+     "top": 379,
+     "tag": "h2",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Jelajahi event pilihanmu.",
+     "words": 3,
+     "lines": 1,
+     "size": 24,
+     "font": "Figtree"
+    },
+    "headings": [
+     {
+      "text": "Event",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Figtree",
+      "weight": 700,
+      "tracking": -0.025,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.33,
+      "top": 379,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Figtree",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      10,
+      11,
+      12,
+      14,
+      16,
+      18,
+      20,
+      24,
+      30
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "Figtree",
+      "size": 14,
+      "leading": 1.71,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 4.8
+     },
+     "measureChars": 55,
+     "max": {
+      "size": 30,
+      "vw": 2.1,
+      "font": "Figtree",
+      "text": "Event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.041,
+     "microSamples": [
+      "ARC Ticket Event",
+      "Pilihan minggu ini"
+     ],
+     "upperShare": 0.06,
+     "centerShare": 0.07,
+     "smallText": 19
+    },
+    "eyebrows": [
+     {
+      "text": "Pilihan event",
+      "above": "Event",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": true,
+      "size": 12,
+      "top": 335
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f7f4ee",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.36,
+      "l": 0.95
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f6f9ff",
+       "top": 0,
+       "hsl": {
+        "h": 220,
+        "s": 1,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 65,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#64748b",
+       "share": 0.4
+      },
+      {
+       "color": "#144ba3",
+       "share": 0.12
+      },
+      {
+       "color": "#102c57",
+       "share": 0.09
+      },
+      {
+       "color": "#94a3b8",
+       "share": 0.08
+      },
+      {
+       "color": "#475569",
+       "share": 0.08
+      }
+     ],
+     "button": {
+      "bg": "#144ba3",
+      "hsl": {
+       "h": 217,
+       "s": 0.78,
+       "l": 0.36
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 6,
+     "inHero": 3,
+     "radius": "pill",
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Login ↗",
+      "Lihat Detail ↗",
+      "Cari Event"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 3,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))"
+     ],
+     "gradientText": 0,
+     "hairlines": 10,
+     "hairlineSamples": [
+      "header.sticky.top-0 1440px",
+      "section.border-b.border-blue-100 1440px",
+      "div.flex.flex-col 1216px",
+      "div.flex.flex-col 1216px",
+      "form#catalog-filter.mt-5.grid 1216px"
+     ],
+     "outlinedBoxes": 4,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 4,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 4,
+     "mediaRadius": 8,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.2
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "figtree"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 2252,
+    "margins": {
+     "left": 112,
+     "right": 112
+    },
+    "sections": [
+     {
+      "sel": "section.border-b.border-blue-100",
+      "tag": "section",
+      "top": 65,
+      "height": 619,
+      "words": 40,
+      "media": 1,
+      "middle": 306,
+      "heading": {
+       "text": "Event",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 112,
+      "right": 113,
+      "textLeft": 112,
+      "textRight": 121,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.mt-9.space-y-10",
+      "tag": "div",
+      "top": 919,
+      "height": 532,
+      "words": 23,
+      "media": 1,
+      "middle": 848,
+      "heading": {
+       "text": "Event Mendatang",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 112,
+      "right": 121,
+      "textLeft": 112,
+      "textRight": 121,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.grid.min-w-0",
+      "tag": "div",
+      "top": 1640,
+      "height": 464,
+      "words": 30,
+      "media": 2,
+      "middle": 18,
+      "heading": {
+       "text": "Event",
+       "size": 16,
+       "tag": "h3"
+      },
+      "left": 113,
+      "right": 729,
+      "textLeft": 133,
+      "textRight": 767,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Jelajahi event pilihanmu.",
+      "size": 24,
+      "top": 126,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 112,
+      "n": 4
+     },
+     {
+      "x": 133,
+      "n": 2
+     },
+     {
+      "x": 153,
+      "n": 1
+     },
+     {
+      "x": 441,
+      "n": 1
+     },
+     {
+      "x": 944,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 9,
+    "bodySize": 12,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.18,
+    "voidBox": {
+     "x": 300,
+     "y": 240,
+     "w": 360,
+     "h": 660
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    1,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2300,
+     "screens": 2.2,
+     "words": 158,
+     "img": 5,
+     "video": 0,
+     "canvas": 0,
+     "svg": 13,
+     "sections": 4,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "GEqJIzqzgyvD5Cytq0AZGBWcZ5eP0nJ4dy2Gfds5.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Event",
+     "words": 1,
+     "chars": 5,
+     "lines": 1,
+     "size": 30,
+     "vw": 3.9,
+     "font": "Figtree",
+     "weight": 700,
+     "tracking": -0.025,
+     "leading": 1.2,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.32,
+     "top": 364,
+     "tag": "h2",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Jelajahi event pilihanmu.",
+     "words": 3,
+     "lines": 1,
+     "size": 24,
+     "font": "Figtree"
+    },
+    "headings": [
+     {
+      "text": "Event",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Figtree",
+      "weight": 700,
+      "tracking": -0.025,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.32,
+      "top": 364,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Figtree",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      10,
+      11,
+      12,
+      14,
+      16,
+      18,
+      20,
+      24,
+      30
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "Figtree",
+      "size": 14,
+      "leading": 1.71,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 4.8
+     },
+     "measureChars": 55,
+     "max": {
+      "size": 30,
+      "vw": 3.9,
+      "font": "Figtree",
+      "text": "Event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.041,
+     "microSamples": [
+      "ARC Ticket Event",
+      "Pilihan minggu ini"
+     ],
+     "upperShare": 0.06,
+     "centerShare": 0.07,
+     "smallText": 19
+    },
+    "eyebrows": [
+     {
+      "text": "Pilihan event",
+      "above": "Event",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": true,
+      "size": 12,
+      "top": 320
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f7f4ee",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.36,
+      "l": 0.95
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f6f9ff",
+       "top": 0,
+       "hsl": {
+        "h": 220,
+        "s": 1,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 65,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#64748b",
+       "share": 0.4
+      },
+      {
+       "color": "#144ba3",
+       "share": 0.12
+      },
+      {
+       "color": "#102c57",
+       "share": 0.09
+      },
+      {
+       "color": "#94a3b8",
+       "share": 0.08
+      },
+      {
+       "color": "#475569",
+       "share": 0.08
+      }
+     ],
+     "button": {
+      "bg": "#144ba3",
+      "hsl": {
+       "h": 217,
+       "s": 0.78,
+       "l": 0.36
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 6,
+     "inHero": 3,
+     "radius": "pill",
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Login ↗",
+      "Lihat Detail ↗",
+      "Cari Event"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 3,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))"
+     ],
+     "gradientText": 0,
+     "hairlines": 10,
+     "hairlineSamples": [
+      "header.sticky.top-0 768px",
+      "section.border-b.border-blue-100 768px",
+      "div.flex.flex-col 704px",
+      "div.flex.flex-col 704px",
+      "form#catalog-filter.mt-5.grid 704px"
+     ],
+     "outlinedBoxes": 4,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 4,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 4,
+     "mediaRadius": 8,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.17
+     }
+    ],
+    "nav": {
+     "links": 5,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "figtree"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2300,
+    "margins": {
+     "left": 32,
+     "right": 32
+    },
+    "sections": [
+     {
+      "sel": "section.border-b.border-blue-100",
+      "tag": "section",
+      "top": 65,
+      "height": 589,
+      "words": 40,
+      "media": 1,
+      "middle": 67,
+      "heading": {
+       "text": "Event",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 33,
+      "textLeft": 32,
+      "textRight": 41,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#catalog.mx-auto.max-w-7xl",
+      "tag": "section",
+      "top": 654,
+      "height": 1537,
+      "words": 75,
+      "media": 3,
+      "middle": 0,
+      "heading": {
+       "text": "Mau ke event apa?",
+       "size": 20,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 32,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Jelajahi event pilihanmu.",
+      "size": 24,
+      "top": 126,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 4
+     },
+     {
+      "x": 53,
+      "n": 2
+     },
+     {
+      "x": 73,
+      "n": 1
+     },
+     {
+      "x": 352,
+      "n": 1
+     },
+     {
+      "x": 413,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 9,
+    "bodySize": 12,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 4,
+   "filled": [
+    1,
+    0.99,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 0,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 3203,
+     "screens": 3.8,
+     "words": 147,
+     "img": 5,
+     "video": 0,
+     "canvas": 0,
+     "svg": 13,
+     "sections": 4,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "6UJqfdD59yrphcmMDl9DFv2c0BhoPSodWA2uT0XS.png",
+      "GEqJIzqzgyvD5Cytq0AZGBWcZ5eP0nJ4dy2Gfds5.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Event",
+     "words": 1,
+     "chars": 5,
+     "lines": 1,
+     "size": 24,
+     "vw": 6.2,
+     "font": "Figtree",
+     "weight": 700,
+     "tracking": -0.025,
+     "leading": 1.25,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.77,
+     "top": 573,
+     "tag": "h2",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Jelajahi event pilihanmu.",
+     "words": 3,
+     "lines": 1,
+     "size": 20,
+     "font": "Figtree"
+    },
+    "headings": [
+     {
+      "text": "Event",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Figtree",
+      "weight": 700,
+      "tracking": -0.025,
+      "leading": 1.25,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.77,
+      "top": 573,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Figtree",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      10,
+      11,
+      12,
+      14,
+      16,
+      18,
+      20,
+      24
+     ],
+     "sizeCount": 8,
+     "notLoaded": [],
+     "body": {
+      "font": "Figtree",
+      "size": 14,
+      "leading": 1.71,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 4.8
+     },
+     "measureChars": 50,
+     "max": {
+      "size": 24,
+      "vw": 6.2,
+      "font": "Figtree",
+      "text": "Event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.044,
+     "microSamples": [
+      "ARC Ticket Event",
+      "Pilihan minggu ini"
+     ],
+     "upperShare": 0.06,
+     "centerShare": 0.07,
+     "smallText": 18
+    },
+    "eyebrows": [
+     {
+      "text": "Pilihan event",
+      "above": "Event",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": true,
+      "size": 12,
+      "top": 529
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f7f4ee",
+     "bodyBgHsl": {
+      "h": 40,
+      "s": 0.36,
+      "l": 0.95
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f6f9ff",
+       "top": 0,
+       "hsl": {
+        "h": 220,
+        "s": 1,
+        "l": 0.98
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 65,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#64748b",
+       "share": 0.43
+      },
+      {
+       "color": "#144ba3",
+       "share": 0.1
+      },
+      {
+       "color": "#102c57",
+       "share": 0.09
+      },
+      {
+       "color": "#94a3b8",
+       "share": 0.09
+      },
+      {
+       "color": "#475569",
+       "share": 0.08
+      }
+     ],
+     "button": {
+      "bg": "#144ba3",
+      "hsl": {
+       "h": 217,
+       "s": 0.78,
+       "l": 0.36
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 1,
+     "radius": "pill",
+     "height": 36,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Lihat Detail ↗"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 3,
+     "scrims": 0,
+     "gradientSamples": [
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+      "div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))"
+     ],
+     "gradientText": 0,
+     "hairlines": 10,
+     "hairlineSamples": [
+      "header.sticky.top-0 390px",
+      "section.border-b.border-blue-100 390px",
+      "div.flex.flex-col 350px",
+      "div.flex.flex-col 350px",
+      "form#catalog-filter.mt-5.grid 350px"
+     ],
+     "outlinedBoxes": 4,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 4,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 4,
+     "mediaRadius": 8,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.21
+     }
+    ],
+    "nav": {
+     "links": 1,
+     "fixed": true,
+     "height": 65,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "figtree"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 3203,
+    "margins": {
+     "left": 20,
+     "right": 20
+    },
+    "sections": [
+     {
+      "sel": "section.border-b.border-blue-100",
+      "tag": "section",
+      "top": 65,
+      "height": 744,
+      "words": 37,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Event",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 21,
+      "textLeft": 20,
+      "textRight": 33,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "form#catalog-filter.mt-5.grid",
+      "tag": "form",
+      "top": 966,
+      "height": 177,
+      "words": 2,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 20,
+      "right": 20,
+      "textLeft": 162,
+      "textRight": 162,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.mt-9.space-y-10",
+      "tag": "div",
+      "top": 1179,
+      "height": 587,
+      "words": 23,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Event Mendatang",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 21,
+      "textLeft": 20,
+      "textRight": 29,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "div.grid.min-w-0",
+      "tag": "div",
+      "top": 2000,
+      "height": 1014,
+      "words": 30,
+      "media": 2,
+      "middle": 0,
+      "heading": {
+       "text": "Event",
+       "size": 16,
+       "tag": "h3"
+      },
+      "left": 21,
+      "right": 21,
+      "textLeft": 37,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.border-t.border-blue-100",
+      "tag": "footer",
+      "top": 3054,
+      "height": 149,
+      "words": 15,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 20,
+      "right": 92,
+      "textLeft": 20,
+      "textRight": 92,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Jelajahi event pilihanmu.",
+      "size": 20,
+      "top": 118,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 20,
+      "n": 5
+     },
+     {
+      "x": 37,
+      "n": 4
+     }
+    ],
+    "leftBlocks": 9,
+    "bodySize": 12,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "FAIL",
+   "id": "eyebrow",
+   "width": 1440,
+   "message": "1 eyebrow/kicker label(s) above headings: \"Pilihan event\" (pill) above \"Event\"",
+   "fix": "Delete them. If the label carried real information, fold it into the headline or the supporting sentence.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "micro-label",
+   "width": 1440,
+   "message": "2 tiny uppercase letter-spaced label(s): \"ARC Ticket Event\", \"Pilihan minggu ini\"",
+   "fix": "Prefer sentence case at body size.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "gradient",
+   "width": 1440,
+   "message": "3 gradient fill(s): div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255)) | div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255)) | div.flex.flex-1 → linear-gradient(rgb(255, 255, 255), rgb(248, 251, 255))",
+   "fix": "Use a flat colour or a real image. The only gradient allowed by default is a neutral scrim over a photo for legibility.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "hairline",
+   "width": 1440,
+   "message": "10 thin rule(s)/divider line(s): header.sticky.top-0 1440px | section.border-b.border-blue-100 1440px | div.flex.flex-col 1216px | div.flex.flex-col 1216px",
+   "fix": "Delete. Separate with space, a tone change, or scale. Lines are only for real tables and form fields.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "outlined-box",
+   "width": 1440,
+   "message": "4 boxes drawn with a 1px outline.",
+   "fix": "Define a surface by its fill (one tone step from the page) or leave the content unboxed.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "palette-cream",
+   "width": 1440,
+   "message": "Yellow-cream background (page background #f7f4ee).",
+   "fix": "Use the drawn palette. If you want warmth, take a low-chroma stone or bone, not a yellow cream.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "body-size",
+   "width": 1440,
+   "message": "Body text is 14px (the size most of the running text is set in).",
+   "fix": "Body copy 16–20px. Map small sizes from blueprints onto your body step.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "grey-body",
+   "width": 1440,
+   "message": "The running text is a soft grey on its ground (4.8:1).",
+   "fix": "Set body copy in the full ink (7:1 or more). Keep the muted ink for secondary notes; pages read thin and unfinished when everything is grey.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "FAIL",
+   "id": "small-text",
+   "width": 1440,
+   "message": "19 text blocks under 13px.",
+   "fix": "Nothing meant to be read goes below 13px.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "focal-point",
+   "width": 1440,
+   "message": "The first screen has no dominant element: the largest type is 30px (2.1vw) and no single picture holds a third of the viewport.",
+   "fix": "Make one thing lead: the headline at display size, or one large picture. A grid of many small pictures is not one thing; in blind tests jurors marked a first screen without a headline down every time. On the strongest studied sites the largest type has a median of 8.4vw.",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "empty-middle",
+   "width": 1440,
+   "message": "1 section(s) have content at both edges and 848px of nothing between: \"Event Mendatang\"",
+   "fix": "Bring the two parts together on the grid, or put the picture or figure of the section in the middle. An empty middle third reads as a hole, the same as an empty half."
+  },
+  {
+   "level": "WARN",
+   "id": "small-title",
+   "width": 1440,
+   "message": "The h1 is 24px (\"Jelajahi event pilihanmu.\").",
+   "fix": "Set the title at display size, or make the large text of the first screen the h1.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "name-only-title",
+   "width": 1440,
+   "message": "The h1 is a bare name (\"Jelajahi event pilihanmu.\") and nothing else on the first screen says what this is.",
+   "fix": "Keep the name if it leads, and give the line under it (18px or more) the plain words: what it is, for whom, where or when. In the study of 97 Sites of the Day, first screens that named nothing lost usability and content points.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Only 0 element(s) moved while the page loaded and scrolled.",
+   "fix": "Build the motion layer (SKILL.md step 9, references/motion.md): the signature move, an entrance for the parts of every section, feedback on every control, and one moving picture. Transform and opacity only, with a reduced-motion fallback."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "D:\\FP\\Ticket Event\\.taste-skill\\before\\desktop-fold.jpg",
+   "pages": [
+    "D:\\FP\\Ticket Event\\.taste-skill\\before\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "D:\\FP\\Ticket Event\\.taste-skill\\before\\tablet-fold.jpg",
+   "pages": [
+    "D:\\FP\\Ticket Event\\.taste-skill\\before\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "D:\\FP\\Ticket Event\\.taste-skill\\before\\mobile-fold.jpg",
+   "pages": [
+    "D:\\FP\\Ticket Event\\.taste-skill\\before\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

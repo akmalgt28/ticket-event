@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PublicOrderStatusResource extends JsonResource
 {
@@ -47,6 +48,17 @@ class PublicOrderStatusResource extends JsonResource
                 'paid_at' => $payment->paid_at?->toISOString(),
                 'proof_uploaded_at' => $payment->proof_uploaded_at?->toISOString(),
             ] : null,
+            'tickets' => $this->order_status?->value === 'paid'
+                ? $this->tickets->map(fn ($ticket): array => [
+                    'ticket_number' => $ticket->ticket_number,
+                    'attendee_name' => $ticket->attendee?->name ?? 'Peserta',
+                    'status' => $ticket->status?->value,
+                    'checked_in_at' => $ticket->checked_in_at?->toISOString(),
+                    'qr_svg' => $ticket->qr_token
+                        ? QrCode::format('svg')->size(240)->margin(1)->generate($ticket->qr_token)
+                        : null,
+                ])->values()->all()
+                : [],
         ];
     }
 }

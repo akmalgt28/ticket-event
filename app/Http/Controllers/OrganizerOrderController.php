@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Http\Resources\OrderResource;
 use App\Mail\EticketMail;
 use App\Models\Order;
+use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OrganizerOrderController extends Controller
 {
@@ -75,7 +77,9 @@ class OrganizerOrderController extends Controller
                 'payment' => $order->payments->first() ? [
                     'status' => $order->payments->first()->status?->value,
                     'amount' => (string) $order->payments->first()->amount,
-                    'proof_url' => $order->payments->first()->proof_path ? Storage::disk('public')->url($order->payments->first()->proof_path) : null,
+                    'proof_url' => $order->payments->first()->proof_path
+                        ? route('organizer.payments.proof', $order->payments->first()->id)
+                        : null,
                 ] : null,
             ]),
             'filters' => [
@@ -84,6 +88,18 @@ class OrganizerOrderController extends Controller
                 'payment_status' => (string) $request->query('payment_status', ''),
             ],
         ]);
+    }
+
+    public function downloadProof(Payment $payment): StreamedResponse
+    {
+        Gate::authorize('view', $payment->order);
+
+        abort_unless($payment->proof_path, 404);
+
+        return Storage::disk('local')->download(
+            $payment->proof_path,
+            'payment-proof-'.$payment->id.'.'.pathinfo($payment->proof_path, PATHINFO_EXTENSION),
+        );
     }
 
     public function show(Order $order): JsonResponse
