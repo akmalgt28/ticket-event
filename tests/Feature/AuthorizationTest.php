@@ -74,4 +74,13 @@ class AuthorizationTest extends TestCase
         $this->assertTrue(Gate::forUser($admin)->allows('viewReports'));
         $this->assertFalse(Gate::forUser($staff)->allows('viewReports'));
     }
+
+    public function test_seed_assigns_owner_to_existing_first_user_without_privileged_role(): void
+    {
+        $bootstrapUser = User::factory()->create();
+
+        $this->seed();
+
+        $this->assertTrue($bootstrapUser->fresh()->hasRole('owner'));
+    }
 }

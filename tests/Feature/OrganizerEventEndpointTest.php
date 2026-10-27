@@ -131,4 +131,46 @@ class OrganizerEventEndpointTest extends TestCase
         $this->assertNotNull($event->banner_path);
         Storage::disk('public')->assertExists($event->banner_path);
     }
+
+    public function test_event_banner_is_available_through_storage_fallback(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('events/fallback.jpg', 'poster-content');
+
+        $response = $this->get('/storage/events/fallback.jpg');
+
+        $response->assertOk();
+        $this->assertFileExists(Storage::disk('public')->path('events/fallback.jpg'));
+    }
+
+    public function test_admin_can_update_event_with_multipart_method_spoofing(): void
+    {
+        Storage::fake('public');
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $event = Event::factory()->create([
+            'title' => 'Original Event',
+            'description' => 'Original description.',
+        ]);
+
+        $response = $this->actingAs($admin)->withHeaders(['X-Inertia' => 'true'])->post('/organizer/events/'.$event->id, [
+            '_method' => 'patch',
+            'title' => 'Updated Event',
+            'description' => 'Updated description.',
+            'banner' => UploadedFile::fake()->image('updated-banner.jpg', 1200, 630),
+            'start_at' => '2026-12-01 09:00:00',
+            'end_at' => '2026-12-01 17:00:00',
+            'location_name' => 'Updated Hall',
+            'location_address' => 'Updated address',
+        ]);
+
+        $response->assertRedirect(route('organizer.events.index'));
+        $event->refresh();
+
+        $this->assertSame('Updated Event', $event->title);
+        $this->assertSame('Updated description.', $event->description);
+        $this->assertNotNull($event->banner_path);
+        Storage::disk('public')->assertExists($event->banner_path);
+    }
 }

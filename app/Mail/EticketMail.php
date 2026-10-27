@@ -3,9 +3,11 @@
 namespace App\Mail;
 
 use App\Models\EmailDelivery;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -34,7 +36,7 @@ class EticketMail extends Mailable implements ShouldQueue
             return [
                 'ticket_number' => $ticket->ticket_number,
                 'attendee_name' => $ticket->attendee?->name ?? 'Peserta',
-                'qr_svg' => QrCode::format('svg')->size(220)->margin(1)->generate($ticket->qr_token),
+                'qr_svg' => (string) QrCode::format('svg')->size(220)->margin(1)->generate($ticket->qr_token),
             ];
         })->values()->all();
     }
@@ -61,7 +63,16 @@ class EticketMail extends Mailable implements ShouldQueue
 
     public function attachments(): array
     {
-        return [];
+        return [
+            Attachment::fromData(
+                fn (): string => Pdf::loadView('emails.eticket-pdf', [
+                    'orderNumber' => $this->orderNumber,
+                    'eventTitle' => $this->eventTitle,
+                    'ticketData' => $this->ticketData,
+                ])->setPaper('a4')->output(),
+                "e-ticket-{$this->orderNumber}.pdf",
+            )->withMime('application/pdf'),
+        ];
     }
 
     public function failed(Throwable $exception): void

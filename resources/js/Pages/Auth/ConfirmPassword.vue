@@ -35,7 +35,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password"
                     required
-                    autocomplete="current-password"
+                    autocomplete="current-password" placeholder="Masukkan password saat ini"
                     autofocus
                 />
                 <InputError class="mt-2" :message="form.errors.password" />

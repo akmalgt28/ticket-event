@@ -19,7 +19,7 @@ class ManualPaymentProofRequest extends FormRequest
     {
         return [
             'customer_email' => ['required', 'email', 'max:255'],
-            'proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'proof' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png', 'mimetypes:image/jpeg,image/png', 'extensions:jpg,jpeg,png', 'max:5120'],
         ];
     }
 }

@@ -15,8 +15,15 @@ const form = useForm({
 
 function submit() {
     const options = { forceFormData: true, preserveScroll: true };
-    if (editing) form.patch(route('organizer.events.update', props.event.id), options);
-    else form.post(route('organizer.events.store'), options);
+
+    if (editing) {
+        form.transform((data) => ({ ...data, _method: 'patch' }))
+            .post(route('organizer.events.update', props.event.id), options);
+
+        return;
+    }
+
+    form.post(route('organizer.events.store'), options);
 }
 </script>
 
@@ -26,14 +33,14 @@ function submit() {
         <template #header><div><p class="text-xs font-bold uppercase tracking-[0.28em] text-[var(--brand-primary)]">Operations</p><h2 class="mt-1 text-2xl font-black tracking-tight text-slate-900">{{ editing ? 'Edit event' : 'Buat event' }}</h2></div></template>
         <div class="min-h-[calc(100vh-9rem)] bg-[#f4f7fb] px-4 py-8 sm:px-6 lg:px-8"><div class="mx-auto max-w-4xl"><form class="space-y-6 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8" @submit.prevent="submit">
             <div class="grid gap-6 sm:grid-cols-2">
-                <div class="sm:col-span-2"><InputLabel value="Judul event" /><input v-model="form.title" type="text" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.title" /></div>
-                <div class="sm:col-span-2"><InputLabel value="Deskripsi" /><textarea v-model="form.description" rows="5" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.description" /></div><div class="sm:col-span-2"><InputLabel value="Banner event" /><input type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" @input="form.banner = $event.target.files[0]" /><InputError class="mt-2" :message="form.errors.banner" /></div>
-                <div><InputLabel value="Mulai" /><input v-model="form.start_at" type="datetime-local" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.start_at" /></div>
-                <div><InputLabel value="Selesai" /><input v-model="form.end_at" type="datetime-local" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.end_at" /></div>
-                <div><InputLabel value="Nama lokasi" /><input v-model="form.location_name" type="text" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.location_name" /></div>
-                <div><InputLabel value="Telepon kontak" /><input v-model="form.contact_phone" type="text" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.contact_phone" /></div>
-                <div class="sm:col-span-2"><InputLabel value="Alamat lokasi" /><textarea v-model="form.location_address" rows="3" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.location_address" /></div>
-                <div class="sm:col-span-2"><InputLabel value="Email kontak" /><input v-model="form.contact_email" type="email" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.contact_email" /></div>
+                <div class="sm:col-span-2"><InputLabel value="Judul event" /><input v-model="form.title" type="text" placeholder="Contoh: Konser Musik Akhir Tahun" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.title" /></div>
+                <div class="sm:col-span-2"><InputLabel value="Deskripsi" /><textarea v-model="form.description" rows="5" placeholder="Jelaskan acara, agenda, dan informasi penting untuk peserta..." class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.description" /></div><div class="sm:col-span-2"><InputLabel value="Banner event" /><input type="file" accept="image/jpeg,image/png,image/webp" title="Pilih banner JPG, PNG, atau WEBP" class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" @input="form.banner = $event.target.files[0]" /><InputError class="mt-2" :message="form.errors.banner" /></div>
+                <div><InputLabel value="Mulai" /><input v-model="form.start_at" type="datetime-local" title="Pilih waktu mulai event" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.start_at" /></div>
+                <div><InputLabel value="Selesai" /><input v-model="form.end_at" type="datetime-local" title="Pilih waktu selesai event" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.end_at" /></div>
+                <div><InputLabel value="Nama lokasi" /><input v-model="form.location_name" type="text" placeholder="Contoh: Gedung Serbaguna Jakarta" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.location_name" /></div>
+                <div><InputLabel value="Telepon kontak" /><input v-model="form.contact_phone" type="text" placeholder="Contoh: 081234567890" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.contact_phone" /></div>
+                <div class="sm:col-span-2"><InputLabel value="Alamat lokasi" /><textarea v-model="form.location_address" rows="3" placeholder="Contoh: Jl. Sudirman No. 10, Jakarta Pusat" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.location_address" /></div>
+                <div class="sm:col-span-2"><InputLabel value="Email kontak" /><input v-model="form.contact_email" type="email" placeholder="Contoh: panitia@contoh.com" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.contact_email" /></div>
             </div>
             <div class="flex items-center justify-end gap-3 border-t border-slate-100 pt-6"><Link :href="route('organizer.events.index')" class="rounded-xl px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50">Batal</Link><button type="submit" :disabled="form.processing" class="rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white hover:bg-[var(--brand-primary)] disabled:opacity-50">{{ form.processing ? 'Menyimpan...' : 'Simpan event' }}</button></div>
         </form></div></div>

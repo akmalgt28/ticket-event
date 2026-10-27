@@ -16,12 +16,14 @@ const proof = ref(null);
 const proofInput = ref(null);
 const proofError = ref('');
 const notice = ref('');
-const detailsVisible = ref(props.mode !== 'payment');
+const detailsVisible = ref(false);
 const currentTime = ref(Date.now());
 let clockTimer;
 const isPayment = computed(() => props.mode === 'payment');
 const deadlinePassed = computed(() => Boolean(order.value?.expires_at && new Date(order.value.expires_at).getTime() <= currentTime.value));
 const canPay = computed(() => order.value?.order_status === 'pending' && ['pending', 'failed'].includes(order.value.payment_status) && !deadlinePassed.value);
+const proofUploaded = computed(() => Boolean(order.value?.payment?.proof_uploaded_at));
+const canUploadProof = computed(() => canPay.value && !proofUploaded.value);
 const bankAccounts = computed(() => order.value?.payment_options?.bank_accounts || []);
 const tickets = computed(() => order.value?.tickets || []);
 const statusKey = computed(() => ['expired', 'cancelled', 'refunded'].includes(order.value?.order_status) ? order.value.order_status : order.value?.payment_status);
@@ -46,7 +48,7 @@ async function lookup() {
         order.value = body.data;
         credentials.value = payload;
         currentTime.value = Date.now();
-        if (body.data.payment?.proof_uploaded_at) detailsVisible.value = true;
+        detailsVisible.value = true;
     } catch { error.value = 'Koneksi gagal. Silakan coba lagi.'; } finally { loading.value = false; }
 }
 
@@ -74,8 +76,8 @@ function chooseProof(event) {
     proof.value = null;
     proofError.value = '';
     if (!file) return;
-    if (!['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)) {
-        proofError.value = 'Gunakan file JPG, PNG, atau PDF.';
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        proofError.value = 'Gunakan file JPG atau PNG.';
     } else if (file.size > 5 * 1024 * 1024) {
         proofError.value = 'Ukuran file maksimal 5 MB.';
     } else {
@@ -85,7 +87,7 @@ function chooseProof(event) {
 }
 
 async function uploadProof() {
-    if (!proof.value || !canPay.value || paymentProcessing.value) return;
+    if (!proof.value || !canUploadProof.value || paymentProcessing.value) return;
     paymentProcessing.value = true;
     error.value = '';
     notice.value = '';
@@ -141,7 +143,7 @@ onUnmounted(() => clearInterval(clockTimer));
                             <h2 class="type-title-md mb-5 text-[#101014]">Cari pesanan</h2>
                             <form class="space-y-5" @submit.prevent="lookup()">
                                 <div><label for="order-number" class="type-body-sm-strong mb-2 block text-[#101014]">Nomor order</label><input id="order-number" v-model="form.order_number" required maxlength="50" class="arc-input" placeholder="ORD-..." /></div>
-                                <div><label for="order-email" class="type-body-sm-strong mb-2 block text-[#101014]">Email pembeli</label><input id="order-email" v-model="form.customer_email" required type="email" maxlength="255" autocomplete="email" class="arc-input" /></div>
+                                <div><label for="order-email" class="type-body-sm-strong mb-2 block text-[#101014]">Email pembeli</label><input id="order-email" v-model="form.customer_email" required type="email" maxlength="255" autocomplete="email" placeholder="Contoh: kamu@email.com" class="arc-input" /></div>
                                 <button type="submit" :disabled="loading || paymentProcessing" class="arc-button w-full">{{ loading ? 'Mengecek...' : 'Cek status' }}</button>
                             </form>
                         </section>
@@ -162,7 +164,7 @@ onUnmounted(() => clearInterval(clockTimer));
                                 <button type="button" class="type-body-sm-strong mt-5 text-[var(--brand-primary)] underline underline-offset-4" :disabled="loading || paymentProcessing" @click="lookup()">Perbarui status</button>
                             </section>
 
-                            <section v-if="statusKey === 'paid' && tickets.length" class="mb-5 rounded-lg border border-[#e2e8f0] bg-white p-6 sm:p-7">
+                            <section v-if="detailsVisible && statusKey === 'paid' && tickets.length" class="mb-5 rounded-lg border border-[#e2e8f0] bg-white p-6 sm:p-7">
                                 <div class="mb-5 flex items-end justify-between gap-3">
                                     <div><h2 class="type-title-md text-[#101014]">E-ticket kamu</h2><p class="type-body-sm mt-1 text-[#64748b]">Tunjukkan QR ini saat check-in di lokasi event.</p></div>
                                     <span class="type-caption-strong text-[var(--brand-primary)]">{{ tickets.length }} tiket</span>
@@ -186,14 +188,18 @@ onUnmounted(() => clearInterval(clockTimer));
                                         <div v-if="bankAccounts.length" class="space-y-4"><div v-for="(account, index) in bankAccounts" :key="index" class="type-body-sm"><p class="type-body-sm-strong text-[#101014]">{{ account.bank_name }}</p><div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[#64748b]"><span class="select-all type-body-sm-strong text-[#101014]">{{ account.account_number }}</span><span class="text-[#e2e8f0]" aria-hidden="true">|</span><span>{{ account.account_holder }}</span></div></div></div>
                                         <p v-else class="type-body-sm-relaxed text-[#64748b]">Rekening tujuan belum dikonfigurasi. Hubungi organizer untuk memperoleh rekening resmi sebelum melakukan transfer.</p>
                                     </section>
-                                    <section class="mb-5 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:p-7">
-                                        <p class="type-caption-eyebrow text-center text-[#64748b]">Jumlah transfer</p><p class="type-title-lg my-4 text-center text-[var(--brand-primary)]">{{ money(order.total_amount) }}</p><p class="type-body-sm-relaxed text-[#64748b]">Transfer ke rekening resmi penyelenggara, lalu unggah bukti pembayaran dalam bentuk JPG, PNG, atau PDF (maksimal 5 MB).</p>
+                                    <section v-if="!proofUploaded" class="mb-5 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:p-7">
+                                        <p class="type-caption-eyebrow text-center text-[#64748b]">Jumlah transfer</p><p class="type-title-lg my-4 text-center text-[var(--brand-primary)]">{{ money(order.total_amount) }}</p><p class="type-body-sm-relaxed text-[#64748b]">Transfer ke rekening resmi penyelenggara, lalu unggah bukti pembayaran dalam bentuk JPG atau PNG (maksimal 5 MB).</p>
                                         <form class="mt-5 space-y-3" @submit.prevent="uploadProof">
-                                            <label for="payment-proof" class="type-body-sm-strong flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--brand-primary)] bg-white px-3 py-3 text-center text-[var(--brand-primary)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--brand-primary)]" :class="paymentProcessing ? 'pointer-events-none opacity-50' : ''"><PublicIcon name="upload" class="h-4 w-4 shrink-0" /><span>{{ proof ? proof.name : 'Pilih bukti pembayaran' }}</span><input id="payment-proof" ref="proofInput" type="file" accept="image/jpeg,image/png,application/pdf" required :disabled="paymentProcessing" class="sr-only" :aria-invalid="Boolean(proofError)" aria-describedby="proof-help" @change="chooseProof" /></label>
-                                            <p id="proof-help" class="type-caption-md" :class="proofError ? 'text-rose-700' : 'text-[#64748b]'">{{ proofError || 'JPG, PNG, atau PDF · Maksimal 5 MB' }}</p>
+                                            <label for="payment-proof" class="type-body-sm-strong flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--brand-primary)] bg-white px-3 py-3 text-center text-[var(--brand-primary)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--brand-primary)]" :class="paymentProcessing ? 'pointer-events-none opacity-50' : ''"><PublicIcon name="upload" class="h-4 w-4 shrink-0" /><span>{{ proof ? proof.name : 'Pilih bukti pembayaran' }}</span><input id="payment-proof" ref="proofInput" type="file" accept="image/jpeg,image/png" required :disabled="paymentProcessing" class="sr-only" :aria-invalid="Boolean(proofError)" aria-describedby="proof-help" @change="chooseProof" /></label>
+                                            <p id="proof-help" class="type-caption-md" :class="proofError ? 'text-rose-700' : 'text-[#64748b]'">{{ proofError || 'JPG atau PNG · Maksimal 5 MB' }}</p>
                                             <button type="submit" :disabled="paymentProcessing || !proof" class="arc-button w-full disabled:bg-[#cbd5e1] disabled:text-[#144ba3]">{{ paymentProcessing ? 'Mengunggah...' : 'Upload bukti pembayaran' }}</button>
                                         </form>
                                         <p v-if="notice" role="status" class="type-caption-md mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-800">{{ notice }}</p>
+                                    </section>
+                                    <section v-else class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-6 sm:p-7">
+                                        <p class="type-caption-eyebrow text-emerald-700">Bukti pembayaran diterima</p>
+                                        <p class="type-body-sm-relaxed mt-3 text-emerald-800">Bukti sudah diupload dan sedang menunggu verifikasi organizer. Upload ulang tidak tersedia selama proses verifikasi.</p>
                                     </section>
                                 </template>
                                 <section class="rounded-lg border border-[#e2e8f0] bg-white p-6 text-[#101014] sm:p-7">

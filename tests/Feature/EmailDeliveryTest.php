@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Mail\EticketMail;
 use App\Models\EmailDelivery;
 use App\Models\Order;
+use Closure;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\SentMessage as LaravelSentMessage;
@@ -70,5 +71,33 @@ class EmailDeliveryTest extends TestCase
             'status' => 'sent',
             'message_id' => '<message-123@example.com>',
         ]);
+    }
+
+    public function test_eticket_mail_contains_pdf_attachment(): void
+    {
+        $order = Order::factory()->create();
+        $delivery = EmailDelivery::query()->create([
+            'order_id' => $order->id,
+            'recipient' => $order->customer_email,
+            'type' => 'eticket',
+            'status' => 'queued',
+            'queued_at' => now(),
+        ]);
+
+        $mail = new EticketMail($order->order_number, 'Event', collect(), $delivery->id);
+        $attachments = $mail->attachments();
+        $pdf = null;
+        $attachments[0]->attachWith(
+            fn (string $path): null => null,
+            function (Closure $data) use (&$pdf): null {
+                $pdf = $data();
+
+                return null;
+            },
+        );
+
+        $this->assertCount(1, $attachments);
+        $this->assertIsString($pdf);
+        $this->assertStringStartsWith('%PDF-', $pdf);
     }
 }

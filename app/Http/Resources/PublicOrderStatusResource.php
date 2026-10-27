@@ -55,7 +55,7 @@ class PublicOrderStatusResource extends JsonResource
                     'status' => $ticket->status?->value,
                     'checked_in_at' => $ticket->checked_in_at?->toISOString(),
                     'qr_svg' => $ticket->qr_token
-                        ? QrCode::format('svg')->size(240)->margin(1)->generate($ticket->qr_token)
+                        ? (string) QrCode::format('svg')->size(240)->margin(1)->generate($ticket->qr_token)
                         : null,
                 ])->values()->all()
                 : [],

@@ -48,7 +48,7 @@ class PublicOrderStatusTest extends TestCase
             'qr_token' => 'private-qr-token',
         ]);
 
-        $this->postJson('/api/orders/status', [
+        $response = $this->postJson('/api/orders/status', [
             'order_number' => $order->order_number,
             'customer_email' => $order->customer_email,
         ])
@@ -58,6 +58,8 @@ class PublicOrderStatusTest extends TestCase
             ->assertJsonPath('data.tickets.0.status', 'issued')
             ->assertJsonStructure(['data' => ['tickets' => [['qr_svg']]]])
             ->assertJsonMissingPath('data.tickets.0.qr_token');
+
+        $this->assertIsString($response->json('data.tickets.0.qr_svg'));
     }
 
     public function test_guest_cannot_lookup_order_with_wrong_email(): void

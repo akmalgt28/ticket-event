@@ -35,7 +35,7 @@ const submit = () => {
                     v-model="form.name"
                     required
                     autofocus
-                    autocomplete="name"
+                    autocomplete="name" placeholder="Masukkan nama lengkap"
                 />
 
                 <InputError class="mt-2" :message="form.errors.name" />
@@ -50,7 +50,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.email"
                     required
-                    autocomplete="username"
+                    autocomplete="username" placeholder="Masukkan email aktif"
                 />
 
                 <InputError class="mt-2" :message="form.errors.email" />
@@ -65,7 +65,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password"
                     required
-                    autocomplete="new-password"
+                    autocomplete="new-password" placeholder="Buat password minimal 8 karakter"
                 />
 
                 <InputError class="mt-2" :message="form.errors.password" />
@@ -83,7 +83,7 @@ const submit = () => {
                     class="mt-1 block w-full"
                     v-model="form.password_confirmation"
                     required
-                    autocomplete="new-password"
+                    autocomplete="new-password" placeholder="Buat password minimal 8 karakter"
                 />
 
                 <InputError

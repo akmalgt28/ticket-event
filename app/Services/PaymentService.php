@@ -79,6 +79,12 @@ class PaymentService
                     ]);
                 }
 
+                if ($payment->proof_path || $payment->proof_uploaded_at) {
+                    throw ValidationException::withMessages([
+                        'proof' => 'Bukti pembayaran sudah diupload dan sedang menunggu verifikasi.',
+                    ]);
+                }
+
                 $oldPath = $payment->proof_path;
                 $payment->update([
                     'proof_path' => $path,

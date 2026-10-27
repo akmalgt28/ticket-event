@@ -9,12 +9,12 @@ const form = useForm('checkout:' + props.event.slug + ':' + JSON.stringify(props
     nama: '', wa: '', email: '', profesi: '', brand: '', domisili: '',
 });
 const fields = [
-    { key: 'nama', label: 'Nama lengkap', type: 'text', required: true, maxlength: 255, autocomplete: 'name', error: 'customer_name' },
-    { key: 'wa', label: 'Nomor WhatsApp aktif', type: 'tel', required: true, maxlength: 30, autocomplete: 'tel', error: 'customer_phone' },
-    { key: 'email', label: 'Email', type: 'email', required: true, maxlength: 255, autocomplete: 'email', error: 'customer_email' },
-    { key: 'profesi', label: 'Status / Profesi saat ini', type: 'text', maxlength: 255, autocomplete: 'organization-title' },
-    { key: 'brand', label: 'Nama Usaha / Brand', type: 'text', maxlength: 255, autocomplete: 'organization' },
-    { key: 'domisili', label: 'Domisili', type: 'text', maxlength: 255, autocomplete: 'address-level2' },
+    { key: 'nama', label: 'Nama lengkap', placeholder: 'Contoh: Budi Santoso', type: 'text', required: true, maxlength: 255, autocomplete: 'name', error: 'customer_name' },
+    { key: 'wa', label: 'Nomor WhatsApp aktif', placeholder: 'Contoh: 081234567890', type: 'tel', required: true, maxlength: 30, autocomplete: 'tel', error: 'customer_phone' },
+    { key: 'email', label: 'Email', placeholder: 'Contoh: kamu@email.com', type: 'email', required: true, maxlength: 255, autocomplete: 'email', error: 'customer_email' },
+    { key: 'profesi', label: 'Status / Profesi saat ini', placeholder: 'Contoh: Mahasiswa atau Marketing', type: 'text', maxlength: 255, autocomplete: 'organization-title' },
+    { key: 'brand', label: 'Nama Usaha / Brand', placeholder: 'Contoh: Arcee Studio', type: 'text', maxlength: 255, autocomplete: 'organization' },
+    { key: 'domisili', label: 'Domisili', placeholder: 'Contoh: Jakarta Selatan', type: 'text', maxlength: 255, autocomplete: 'address-level2' },
 ];
 const generalErrors = computed(() => Object.entries(form.errors).filter(([key]) => !fields.some((field) => field.error === key)));
 const selectedItems = computed(() => props.items.map((item) => ({ ...item, ticket: props.event.ticket_types.find((ticket) => ticket.id === item.ticket_type_id) })));
@@ -66,7 +66,7 @@ function submitForm() {
                             </div>
                             <div v-for="field in fields" :key="field.key">
                                 <label :for="'buyer-' + field.key" class="mb-2 block type-body-sm-strong text-[var(--brand-ink)]">{{ field.label }}<span v-if="field.required" class="ml-1 text-rose-600" aria-hidden="true">*</span></label>
-                                <input :id="'buyer-' + field.key" v-model="form[field.key]" :name="field.key" :type="field.type" :required="field.required" :maxlength="field.maxlength" :autocomplete="field.autocomplete" :aria-invalid="Boolean(form.errors[field.error])" :aria-describedby="form.errors[field.error] ? field.key + '-error' : undefined" class="block min-h-11 w-full rounded-md border bg-white px-3.5 type-body-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/15" :class="form.errors[field.error] ? 'border-rose-500' : 'border-slate-300'" />
+                                <input :id="'buyer-' + field.key" v-model="form[field.key]" :name="field.key" :type="field.type" :required="field.required" :maxlength="field.maxlength" :autocomplete="field.autocomplete" :placeholder="field.placeholder" :aria-invalid="Boolean(form.errors[field.error])" :aria-describedby="form.errors[field.error] ? field.key + '-error' : undefined" class="block min-h-11 w-full rounded-md border bg-white px-3.5 type-body-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/15" :class="form.errors[field.error] ? 'border-rose-500' : 'border-slate-300'" />
                                 <p v-if="form.errors[field.error]" :id="field.key + '-error'" class="mt-2 type-caption-md text-rose-700">{{ form.errors[field.error] }}</p>
                             </div>
                             <div class="border-t border-slate-200 pt-6">

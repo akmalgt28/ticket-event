@@ -16,6 +16,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('public.events.index'));
 
+Route::get('/storage/events/{path}', function (string $path) {
+    $file = 'events/'.$path;
+
+    abort_unless(Storage::disk('public')->exists($file), 404);
+
+    return response()->file(Storage::disk('public')->path($file));
+})->where('path', '[A-Za-z0-9._/-]+')->name('storage.events.fallback');
+
 Route::get('/dashboard', OrganizerDashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/events', [PublicEventPageController::class, 'index'])->name('public.events.index');
 Route::get('/order-status', PublicOrderStatusPageController::class)->name('public.orders.status');

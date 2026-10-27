@@ -36,7 +36,15 @@ class DatabaseSeeder extends Seeder
         $adminRole->syncPermissions($permissions->except('checkin.manage')->values());
         $staffRole->syncPermissions([$permissions['checkin.manage']]);
 
-        if (app()->isProduction()) {
+        $hasPrivilegedUser = User::query()
+            ->whereHas('roles', fn ($query) => $query->whereIn('name', ['owner', 'admin']))
+            ->exists();
+
+        if (! $hasPrivilegedUser) {
+            User::query()->orderBy('id')->first()?->assignRole($ownerRole);
+        }
+
+        if (! app()->environment(['local', 'testing'])) {
             return;
         }
 

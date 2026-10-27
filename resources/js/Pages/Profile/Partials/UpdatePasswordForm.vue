@@ -56,7 +56,7 @@ const updatePassword = () => {
                     v-model="form.current_password"
                     type="password"
                     class="mt-1 block w-full"
-                    autocomplete="current-password"
+                    autocomplete="current-password" placeholder="Masukkan password saat ini"
                 />
 
                 <InputError
@@ -74,7 +74,7 @@ const updatePassword = () => {
                     v-model="form.password"
                     type="password"
                     class="mt-1 block w-full"
-                    autocomplete="new-password"
+                    autocomplete="new-password" placeholder="Buat password baru minimal 8 karakter"
                 />
 
                 <InputError :message="form.errors.password" class="mt-2" />
@@ -91,7 +91,7 @@ const updatePassword = () => {
                     v-model="form.password_confirmation"
                     type="password"
                     class="mt-1 block w-full"
-                    autocomplete="new-password"
+                    autocomplete="new-password" placeholder="Buat password baru minimal 8 karakter"
                 />
 
                 <InputError

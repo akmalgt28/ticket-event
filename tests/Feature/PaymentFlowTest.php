@@ -69,6 +69,25 @@ class PaymentFlowTest extends TestCase
         Storage::disk('local')->assertExists($payment->proof_path);
     }
 
+    public function test_customer_cannot_upload_payment_proof_twice(): void
+    {
+        Storage::fake('local');
+        $order = Order::factory()->create();
+        Payment::factory()->for($order)->create([
+            'status' => 'pending',
+            'proof_path' => 'payment-proofs/existing.jpg',
+            'proof_uploaded_at' => now(),
+        ]);
+
+        $response = $this->postJson('/api/orders/'.$order->id.'/payments/manual/proof', [
+            'customer_email' => $order->customer_email,
+            'proof' => UploadedFile::fake()->image('replacement.png'),
+        ]);
+
+        $response->assertUnprocessable()->assertJsonValidationErrors('proof');
+        $this->assertDatabaseCount('payments', 1);
+    }
+
     public function test_admin_can_verify_manual_payment_and_order_is_marked_paid(): void
     {
         Mail::fake();
@@ -220,9 +239,11 @@ class PaymentFlowTest extends TestCase
             ->assertForbidden();
         $this->postJson($url, ['customer_email' => $order->customer_email, 'proof' => UploadedFile::fake()->create('proof.txt', 1, 'text/plain')])
             ->assertUnprocessable()->assertJsonValidationErrors('proof');
-        $this->postJson($url, ['customer_email' => $order->customer_email, 'proof' => UploadedFile::fake()->create('proof.pdf', 5121, 'application/pdf')])
+        $this->postJson($url, ['customer_email' => $order->customer_email, 'proof' => UploadedFile::fake()->create('proof.pdf', 1, 'application/pdf')])
             ->assertUnprocessable()->assertJsonValidationErrors('proof');
 
+        $this->postJson($url, ['customer_email' => $order->customer_email, 'proof' => UploadedFile::fake()->create('proof.php', 1, 'image/jpeg')])
+            ->assertUnprocessable()->assertJsonValidationErrors('proof');
         $this->assertNull($order->payments()->first()->proof_path);
         $this->assertSame([], Storage::disk('local')->allFiles('payment-proofs'));
     }

@@ -263,7 +263,7 @@ try {
     assert(await evaluate('document.body.textContent.includes("0000000000")'));
     await evaluate(`(() => { const transfer=new DataTransfer();transfer.items.add(new File(['invalid'],'proof.txt',{type:'text/plain'})); const input=document.querySelector('#payment-proof');input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true})); })()`);
     await until('document.querySelector("#proof-help").textContent.includes("Gunakan file")');
-    await evaluate(`(() => { const transfer=new DataTransfer();transfer.items.add(new File(['proof'],'proof.pdf',{type:'application/pdf'})); const input=document.querySelector('#payment-proof');input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+    await evaluate(`(() => { const transfer=new DataTransfer();transfer.items.add(new File(['proof'],'proof.png',{type:'image/png'})); const input=document.querySelector('#payment-proof');input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true})); })()`);
     await clickText('Upload bukti pembayaran');
     await until('Boolean(document.querySelector("[role=status]")) && document.body.textContent.includes("Bukti pembayaran diterima")');
     assert.equal(order.payment_status, 'pending');
