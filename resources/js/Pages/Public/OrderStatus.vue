@@ -16,6 +16,8 @@ const proof = ref(null);
 const proofInput = ref(null);
 const proofError = ref('');
 const notice = ref('');
+const copyingAccount = ref('');
+const copyNotices = reactive({});
 const detailsVisible = ref(false);
 const currentTime = ref(Date.now());
 let clockTimer;
@@ -31,6 +33,43 @@ const responseError = (body) => Object.values(body.errors || {}).flat()[0] || bo
 const money = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(value));
 const paymentLabel = (status) => ({ pending: 'Menunggu pembayaran', paid: 'Pembayaran berhasil', failed: 'Pembayaran ditolak', expired: 'Pembayaran kedaluwarsa', cancelled: 'Pesanan dibatalkan', refunded: 'Pembayaran dikembalikan' }[status] || status);
 const dateTime = (value) => value ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(value)) + ' WIB' : '—';
+
+function copyWithSelection(value) {
+    const previousFocus = document.activeElement;
+    const input = document.createElement('textarea');
+    input.value = value;
+    input.setAttribute('readonly', '');
+    input.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+    document.body.appendChild(input);
+    input.select();
+    input.setSelectionRange(0, value.length);
+    try {
+        if (!document.execCommand('copy')) throw new Error('Copy unavailable');
+    } finally {
+        input.remove();
+        previousFocus?.focus({ preventScroll: true });
+    }
+}
+
+async function copyAccountNumber(accountNumber) {
+    if (copyingAccount.value) return;
+    const value = String(accountNumber);
+    copyingAccount.value = value;
+    delete copyNotices[value];
+    try {
+        try {
+            if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+            await navigator.clipboard.writeText(value);
+        } catch {
+            copyWithSelection(value);
+        }
+        copyNotices[value] = { success: true, message: 'Nomor rekening berhasil disalin.' };
+    } catch {
+        copyNotices[value] = { success: false, message: 'Tidak dapat menyalin otomatis. Pilih dan salin nomor rekening di atas.' };
+    } finally {
+        copyingAccount.value = '';
+    }
+}
 
 async function lookup() {
     if (loading.value || paymentProcessing.value) return;
@@ -153,11 +192,11 @@ onUnmounted(() => clearInterval(clockTimer));
 
                         <template v-if="order">
                             <section v-if="!isPayment || !canPay || order.payment?.proof_uploaded_at" class="mb-5 rounded-lg border border-[#e2e8f0] bg-white p-6 sm:p-7">
-                                <div class="mb-5 flex flex-wrap items-start justify-between gap-3"><div><p class="type-caption-eyebrow text-[#64748b]">Ringkasan pesanan</p><h2 class="type-title-md mt-2 text-[#101014]">{{ order.event.title }}</h2></div><span class="type-caption-strong shrink-0 rounded-full px-3 py-1.5" :class="statusKey === 'paid' ? 'bg-emerald-100 text-emerald-800' : statusKey === 'pending' ? 'bg-slate-100 text-[var(--brand-primary)]' : 'bg-rose-100 text-rose-800'">{{ paymentLabel(statusKey) }}</span></div>
+                                <div class="mb-5 flex flex-wrap items-start justify-between gap-3"><div><p class="type-caption-eyebrow text-[#64748b]">Ringkasan pesanan</p><h2 class="type-title-md mt-2 text-[#101014]">{{ order.event.title }}</h2></div><span class="type-caption-strong shrink-0 rounded-full px-3 py-1.5" :class="statusKey === 'paid' ? 'bg-emerald-100 text-emerald-800' : statusKey === 'pending' ? 'bg-slate-100 text-[var(--status-accent)]' : 'bg-rose-100 text-rose-800'">{{ paymentLabel(statusKey) }}</span></div>
                                 <p class="type-caption-md text-[#64748b]">Nomor order</p><p class="type-body-sm-strong mt-1 break-all text-[#101014]">{{ order.order_number }}</p>
                                 <div class="my-5 flex items-center justify-between gap-3 border-y border-[#e2e8f0] py-5"><span class="type-body-sm text-[#64748b]">Total pembayaran</span><strong class="type-title-md text-[var(--brand-primary)]">{{ money(order.total_amount) }}</strong></div>
                                 <p v-if="statusKey === 'paid'" class="type-body-sm-relaxed text-emerald-800">Pembayaran sudah diverifikasi. E-ticket masuk antrean pengiriman ke email pembeli.</p>
-                                <p v-else-if="statusKey === 'pending' && order.payment?.proof_uploaded_at" class="type-body-sm-relaxed text-[var(--brand-primary)]">Bukti pembayaran diterima. Menunggu verifikasi organizer.</p>
+                                <p v-else-if="statusKey === 'pending' && order.payment?.proof_uploaded_at" class="type-body-sm-relaxed text-[var(--status-accent)]">Bukti pembayaran diterima. Menunggu verifikasi organizer.</p>
                                 <p v-else-if="statusKey === 'pending' && deadlinePassed" class="type-body-sm-relaxed text-rose-700">Batas waktu pembayaran telah berakhir. Perbarui status untuk melihat kondisi pesanan terbaru.</p>
                                 <p v-else-if="statusKey === 'pending'" class="type-body-sm-relaxed text-[#64748b]">Lakukan transfer dan unggah bukti pembayaran sebelum batas waktu.</p>
                                 <p v-else class="type-body-sm-relaxed text-[#64748b]">Hubungi organizer jika membutuhkan bantuan terkait pesanan ini.</p>
@@ -171,7 +210,7 @@ onUnmounted(() => clearInterval(clockTimer));
                                 </div>
                                 <div class="grid gap-4 sm:grid-cols-2">
                                     <article v-for="ticket in tickets" :key="ticket.ticket_number" class="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
-                                        <div class="flex items-start justify-between gap-3"><div><p class="type-body-sm-strong text-[#101014]">{{ ticket.attendee_name }}</p><p class="type-caption-md mt-1 text-[#64748b]">{{ ticket.ticket_number }}</p></div><span class="type-caption-strong rounded-md bg-white px-2 py-1 text-[var(--brand-primary)]">{{ ticket.status === 'used' ? 'Sudah dipakai' : 'Aktif' }}</span></div>
+                                        <div class="flex items-start justify-between gap-3"><div><p class="type-body-sm-strong text-[#101014]">{{ ticket.attendee_name }}</p><p class="type-caption-md mt-1 text-[#64748b]">{{ ticket.ticket_number }}</p></div><span class="type-caption-strong rounded-md bg-white px-2 py-1 text-[var(--status-accent)]">{{ ticket.status === 'used' ? 'Sudah dipakai' : 'Aktif' }}</span></div>
                                         <div v-if="ticket.qr_svg" class="mx-auto mt-4 flex w-fit bg-white p-3" v-html="ticket.qr_svg"></div>
                                         <p v-else class="type-caption-md mt-4 text-rose-700">QR belum tersedia. Hubungi organizer.</p>
                                     </article>
@@ -185,7 +224,14 @@ onUnmounted(() => clearInterval(clockTimer));
                                 <template v-else>
                                     <section class="mb-5 rounded-lg border border-[#e2e8f0] bg-white p-6 sm:p-7">
                                         <p class="type-caption-eyebrow mb-4 text-[#64748b]">Rekening tujuan</p>
-                                        <div v-if="bankAccounts.length" class="space-y-4"><div v-for="(account, index) in bankAccounts" :key="index" class="type-body-sm"><p class="type-body-sm-strong text-[#101014]">{{ account.bank_name }}</p><div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[#64748b]"><span class="select-all type-body-sm-strong text-[#101014]">{{ account.account_number }}</span><span class="text-[#e2e8f0]" aria-hidden="true">|</span><span>{{ account.account_holder }}</span></div></div></div>
+                                        <div v-if="bankAccounts.length" class="space-y-4">
+                                            <div v-for="(account, index) in bankAccounts" :key="index" class="type-body-sm">
+                                                <p class="type-body-sm-strong text-[#101014]">{{ account.bank_name }}</p>
+                                                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[#64748b]"><span class="select-all type-body-sm-strong text-[#101014]">{{ account.account_number }}</span><span class="text-[#e2e8f0]" aria-hidden="true">|</span><span>{{ account.account_holder }}</span></div>
+                                                <button type="button" class="arc-button mt-3 min-h-9 px-4 text-xs" :disabled="Boolean(copyingAccount)" @click="copyAccountNumber(account.account_number)">Salin Nomor Rekening</button>
+                                                <p v-if="copyNotices[account.account_number]" role="status" class="type-caption-md mt-2" :class="copyNotices[account.account_number].success ? 'text-[#64748b]' : 'text-rose-700'">{{ copyNotices[account.account_number].message }}</p>
+                                            </div>
+                                        </div>
                                         <p v-else class="type-body-sm-relaxed text-[#64748b]">Rekening tujuan belum dikonfigurasi. Hubungi organizer untuk memperoleh rekening resmi sebelum melakukan transfer.</p>
                                     </section>
                                     <section v-if="!proofUploaded" class="mb-5 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:p-7">

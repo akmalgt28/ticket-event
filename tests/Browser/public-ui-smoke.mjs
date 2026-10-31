@@ -4,12 +4,13 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { resolve, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
 const catalogMode = process.argv.includes('--catalog');
+const paymentSettingsMode = process.argv.includes('--payment-settings');
 const output = resolve(root, 'storage/app/ui-review');
 await mkdir(output, { recursive: true });
 const manifest = JSON.parse(await readFile(resolve(root, 'public/build/manifest.json'), 'utf8'));
@@ -62,6 +63,10 @@ const order = {
 };
 let formErrors = {};
 let created = false;
+if (paymentSettingsMode) {
+    order.payment_options.bank_accounts = JSON.parse(execFileSync('php', ['-r', "echo json_encode((require 'config/ticket-event.php')['bank_transfer']['accounts']);"], { cwd: root, encoding: 'utf8' }));
+    created = true;
+}
 let selectedItems = [{ ticket_type_id: 1, quantity: 3 }];
 let lastPayload;
 const json = (response, body, status = 200, headers = {}) => {
@@ -109,7 +114,7 @@ const server = createServer(async (request, response) => {
             response.writeHead(303, { Location: '/payment' }); response.end(); return;
         }
         let component;
-        let props = { auth: { user: null }, errors: formErrors };
+        let props = { auth: { user: url.searchParams.has('auth') ? { name: 'Test Organizer' } : null }, errors: formErrors };
         if (url.pathname === '/events') component = 'Public/Events', props = { ...props, ...catalogPage(url), auth: { user: url.searchParams.has('auth') ? { name: 'Test Organizer' } : null } };
         else if (url.pathname.endsWith('/checkout')) component = 'Public/Checkout', props = { ...props, event, quantities: {} };
         else if (url.pathname.endsWith('/data-diri')) {
@@ -129,7 +134,7 @@ const server = createServer(async (request, response) => {
 });
 await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
-const browserPaths = [process.env.TICKET_UI_BROWSER, 'C:/Program Files (x86)/Microsoft/EdgeCore/156.0.4314.42/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/bin/chromium'].filter(Boolean);
+const browserPaths = [process.env.TICKET_UI_BROWSER, 'C:/Program Files (x86)/Microsoft/EdgeCore/Optimized/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/bin/chromium'].filter(Boolean);
 const executable = browserPaths.find(existsSync);
 assert(executable, 'Set TICKET_UI_BROWSER to an installed Chromium browser.');
 const browser = spawn(executable, ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--remote-debugging-address=127.0.0.1', '--user-data-dir=' + resolve(output, 'browser-profile'), 'about:blank'], { windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
@@ -163,7 +168,7 @@ try {
         pending.set(id, { resolve: (result) => { clearTimeout(timer); resolve(result); }, reject: (error) => { clearTimeout(timer); reject(error); } });
         websocket.send(JSON.stringify({ id, method, params }));
     });
-    const evaluate = async (expression) => { const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }); if (result.exceptionDetails) throw new Error((result.exceptionDetails.exception?.description || result.exceptionDetails.text) + '\nExpression: ' + expression); return result.result.value; };
+    const evaluate = async (expression) => { const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true, userGesture: true }); if (result.exceptionDetails) throw new Error((result.exceptionDetails.exception?.description || result.exceptionDetails.text) + '\nExpression: ' + expression); return result.result.value; };
     const until = async (expression) => {
         for (let attempt = 0; attempt < 100; attempt++) { if (await evaluate(expression)) return; await new Promise((resolve) => setTimeout(resolve, 50)); }
         throw new Error('UI did not reach expected state: ' + expression + '; exceptions: ' + errors.join('\n'));
@@ -187,7 +192,48 @@ try {
         await viewport(390);
     };
     await send('Runtime.enable'); await send('Page.enable'); await viewport(390);
-    if (catalogMode) {
+    if (paymentSettingsMode) {
+        await send('Browser.grantPermissions', { origin: base, permissions: ['clipboardReadWrite', 'clipboardSanitizedWrite'] });
+        await send('Emulation.setFocusEmulationEnabled', { enabled: true });
+        await send('Page.navigate', { url: base + '/payment?auth=1' });
+        await until('Boolean(document.querySelector("#payment-proof"))');
+        assert(await evaluate('document.body.textContent.includes("BCA") && document.body.textContent.includes("7425245481") && document.body.textContent.includes("Ema Mayumi")'));
+        assert(!(await evaluate('document.body.textContent.includes("Rekening tujuan belum dikonfigurasi")')));
+        const findCopy = `Array.from(document.querySelectorAll('button')).find(el=>el.textContent.trim()==='Salin Nomor Rekening')`;
+        assert.equal(await evaluate(`getComputedStyle(${findCopy}).backgroundColor`), 'rgb(22, 74, 160)');
+        assert.equal(await evaluate(`getComputedStyle(${findCopy}).color`), 'rgb(255, 255, 255)');
+        assert.equal(await evaluate('getComputedStyle(document.querySelector("h1")).color'), 'rgb(16, 16, 20)');
+        assert.equal(await evaluate('getComputedStyle(document.querySelector("header a[href$=dashboard]")).backgroundColor'), 'rgb(22, 74, 160)');
+        await clickText('Salin Nomor Rekening');
+        await until('document.body.textContent.includes("Nomor rekening berhasil disalin.")');
+        assert.equal(await evaluate('navigator.clipboard.readText()'), '7425245481');
+        await evaluate(`window.__originalCopy=document.execCommand.bind(document);Object.defineProperty(navigator,'clipboard',{configurable:true,value:undefined});document.execCommand=(command)=>{window.__fallbackCopy=document.activeElement.value;return command==='copy'};`);
+        await clickText('Salin Nomor Rekening');
+        await until('document.body.textContent.includes("Nomor rekening berhasil disalin.")');
+        assert.equal(await evaluate('window.__fallbackCopy'), '7425245481');
+        assert.equal(await evaluate('document.querySelectorAll("textarea").length'), 0);
+        await evaluate('document.execCommand=()=>false');
+        await clickText('Salin Nomor Rekening');
+        await until('document.body.textContent.includes("Tidak dapat menyalin otomatis.")');
+        await evaluate('document.execCommand=window.__originalCopy');
+        await send('Page.navigate', { url: base + '/payment?auth=1' });
+        await until('Boolean(document.querySelector("#payment-proof"))');
+        await clickText('Salin Nomor Rekening');
+        await until('document.body.textContent.includes("Nomor rekening berhasil disalin.")');
+        await responsive(); await screenshot('payment-bca-mobile');
+        await viewport(1280); await screenshot('payment-bca-desktop'); await viewport(390);
+        await evaluate(`(()=>{const transfer=new DataTransfer();transfer.items.add(new File(['invalid'],'proof.txt',{type:'text/plain'}));const input=document.querySelector('#payment-proof');input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+        await until('document.querySelector("#proof-help").textContent.includes("Gunakan file JPG atau PNG")');
+        await evaluate(`(()=>{const transfer=new DataTransfer();transfer.items.add(new File(['proof'],'proof.png',{type:'image/png'}));const input=document.querySelector('#payment-proof');input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+        await clickText('Upload bukti pembayaran');
+        await until('document.body.textContent.includes("Bukti pembayaran diterima") && !document.querySelector("#payment-proof")');
+        assert.equal(order.payment_status, 'pending');
+        const inheritedStatusColor = await evaluate(`(()=>{const probe=document.createElement('span');probe.style.color=getComputedStyle(document.documentElement).getPropertyValue('--brand-primary');document.body.appendChild(probe);const color=getComputedStyle(probe).color;probe.remove();return color;})()`);
+        assert.equal(await evaluate('getComputedStyle(Array.from(document.querySelectorAll("span")).find(el=>el.textContent.trim()==="Menunggu pembayaran")).color'), inheritedStatusColor);
+        assert(!(await evaluate('document.body.textContent.includes("Pembayaran berhasil")')));
+        assert.equal(errors.length, 0, errors.join('\n'));
+        console.log(JSON.stringify({ result: 'passed', mode: 'payment-settings', checks: ['official account from Laravel configuration', 'ARC blue accents and white button text', 'unchanged ordinary text and payment status colors', 'dashboard button', 'clipboard API', 'HTTP fallback', 'copy failure feedback', 'temporary input cleanup', 'upload validation and pending verification', 'no horizontal overflow'], screenshots: output }));
+    } else if (catalogMode) {
         await send('Page.navigate', { url: base + '/events' });
         await until('Boolean(document.querySelector("#catalog-search"))');
         await responsive(); await screenshot('homepage-mobile');

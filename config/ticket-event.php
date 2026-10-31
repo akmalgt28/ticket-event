@@ -1,10 +1,15 @@
 <?php
 
 return [
-    // Isi rekening resmi di sini. Jangan gunakan nomor rekening dari gambar referensi.
     // Setiap rekening: bank_name, account_number, account_holder (semuanya string).
     'bank_transfer' => [
-        'accounts' => [],
+        'accounts' => [
+            [
+                'bank_name' => 'BCA',
+                'account_number' => '7425245481',
+                'account_holder' => 'Ema Mayumi',
+            ],
+        ],
     ],
 
     // Informasi tambahan berdasarkan slug event, tanpa mengubah skema database.

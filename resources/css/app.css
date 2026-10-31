@@ -5,6 +5,7 @@
 :root {
     --brand-primary: #144ba3;
     --brand-primary-dark: #0e397e;
+    --status-accent: var(--brand-primary);
     --brand-ink: #122b53;
     --brand-paper: #f4f7fb;
     --brand-muted: #64748b;
@@ -52,6 +53,8 @@ body {
 .brand-focus:focus { border-color: var(--brand-primary); outline: 2px solid color-mix(in srgb, var(--brand-primary) 25%, transparent); outline-offset: 1px; }
 
 .public-site {
+    --brand-primary: #164AA0;
+    --brand-primary-dark: #123D84;
     --arc-blue: var(--brand-primary);
     --arc-sky: #f8fafc;
     overflow-wrap: anywhere;

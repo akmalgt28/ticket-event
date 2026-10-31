@@ -99,6 +99,22 @@ class PublicOrderStatusTest extends TestCase
             ->assertJsonPath('data.event.slug', $order->event->slug);
     }
 
+    public function test_payment_details_expose_the_official_bca_account_from_configuration(): void
+    {
+        $order = Order::factory()->create();
+
+        $this->postJson('/api/orders/status', [
+            'order_number' => $order->order_number,
+            'customer_email' => $order->customer_email,
+        ])->assertOk()
+            ->assertJsonPath('data.payment_options.bank_accounts', [[
+                'bank_name' => 'BCA',
+                'account_number' => '7425245481',
+                'account_holder' => 'Ema Mayumi',
+            ]])
+            ->assertJsonPath('data.payment_status', 'pending');
+    }
+
     public function test_unconfigured_bank_accounts_are_empty_instead_of_using_reference_data(): void
     {
         config(['ticket-event.bank_transfer.accounts' => []]);
