@@ -13,6 +13,7 @@ const icons = {
     logout: 'fa-right-from-bracket',
     external: 'fa-arrow-up-right-from-square',
     menu: 'fa-bars',
+    'user-plus': 'fa-user-plus',
 };
 
 const iconClass = computed(() => icons[props.name] || icons.menu);

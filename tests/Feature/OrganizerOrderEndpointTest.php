@@ -163,7 +163,7 @@ class OrganizerOrderEndpointTest extends TestCase
             ->post(route('organizer.orders.resend-eticket', $order))
             ->assertRedirect();
 
-        Mail::assertQueued(EticketMail::class, function (EticketMail $mail) use ($order): bool {
+        Mail::assertSent(EticketMail::class, function (EticketMail $mail) use ($order): bool {
             return $mail->orderNumber === $order->order_number;
         });
         $this->assertDatabaseHas('email_deliveries', [

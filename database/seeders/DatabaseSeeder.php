@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'payments.verify',
             'checkin.manage',
             'reports.view',
+            'users.manage',
         ])->mapWithKeys(fn (string $permission): array => [
             $permission => Permission::firstOrCreate([
                 'name' => $permission,

@@ -42,7 +42,9 @@ const formatTime = (value) => value ? new Intl.DateTimeFormat('id-ID', { hour: '
                         </div>
                         <div class="border-t border-[#e2e8f0] pt-5">
                             <p class="type-caption-eyebrow mb-2 text-[#64748b]">Penyelenggara</p>
-                            <p class="type-body-sm-strong text-[#101014]">{{ event.organizer_name || event.contact_email || event.contact_phone || 'Informasi penyelenggara belum tersedia.' }}</p>
+                            <p class="type-body-sm-strong text-[#101014]">{{ event.organizer_name || 'Informasi penyelenggara belum tersedia.' }}</p>
+                            <p v-if="event.contact_phone" class="type-caption-md mt-1 text-[#64748b]">{{ event.contact_phone }}</p>
+                            <p v-if="event.contact_email" class="type-caption-md text-[#64748b]">{{ event.contact_email }}</p>
                         </div>
                     </section>
 

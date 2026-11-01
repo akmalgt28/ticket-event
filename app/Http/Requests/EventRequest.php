@@ -18,6 +18,7 @@ class EventRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'organizer_name' => ['required', 'string', 'max:255'],
             'banner' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'start_at' => ['required', 'date'],
             'end_at' => ['required', 'date', 'after:start_at'],
@@ -29,3 +30,4 @@ class EventRequest extends FormRequest
         ];
     }
 }
+

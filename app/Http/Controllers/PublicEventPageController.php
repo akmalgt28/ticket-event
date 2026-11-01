@@ -192,7 +192,7 @@ class PublicEventPageController extends Controller
             'slug' => $event->slug,
             'description' => $event->description,
             'category' => $event->getAttribute('category') ?? $details['category'] ?? null,
-            'organizer_name' => $event->getAttribute('organizer_name') ?? $details['organizer_name'] ?? null,
+            'organizer_name' => $event->organizer_name ?? $details['organizer_name'] ?? 'Penyelenggara Event',
             'terms' => $event->getAttribute('terms') ?? $details['terms'] ?? null,
             'banner_url' => $event->banner_path ? Storage::disk('public')->url($event->banner_path) : null,
             'start_at' => $event->start_at?->toISOString(),
@@ -211,3 +211,5 @@ class PublicEventPageController extends Controller
         ];
     }
 }
+
+

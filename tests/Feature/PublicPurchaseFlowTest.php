@@ -184,7 +184,7 @@ class PublicPurchaseFlowTest extends TestCase
             ->assertJsonPath('data.order_status', 'paid')
             ->assertJsonPath('data.payment_status', 'paid');
         $this->assertSame(2, $order->tickets()->whereNotNull('attendee_id')->count());
-        Mail::assertQueued(EticketMail::class, 1);
+        Mail::assertSent(EticketMail::class, 1);
     }
 
     public function test_checkout_revalidates_quota_and_preserves_validation_errors(): void
