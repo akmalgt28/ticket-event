@@ -67,7 +67,7 @@ class PublicPurchaseFlowTest extends TestCase
 
     public function test_event_detail_uses_event_configuration_without_placeholder_organizer_or_terms(): void
     {
-        $event = Event::factory()->create(['status' => 'published']);
+        $event = Event::factory()->create(['status' => 'published', 'organizer_name' => null]);
         config(['ticket-event.events' => [$event->slug => [
             'category' => 'Seminar', 'organizer_name' => 'Penyelenggara Resmi', 'terms' => 'Bawa identitas saat check-in.',
         ]]]);
@@ -76,6 +76,15 @@ class PublicPurchaseFlowTest extends TestCase
             ->where('event.category', 'Seminar')
             ->where('event.organizer_name', 'Penyelenggara Resmi')
             ->where('event.terms', 'Bawa identitas saat check-in.'));
+    }
+
+    public function test_event_detail_prefers_the_saved_organizer_name_over_configuration(): void
+    {
+        $event = Event::factory()->create(['status' => 'published', 'organizer_name' => 'Organizer Database']);
+        config(['ticket-event.events' => [$event->slug => ['organizer_name' => 'Organizer Konfigurasi']]]);
+
+        $this->get(route('public.events.show', $event->slug))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('event.organizer_name', 'Organizer Database'));
     }
 
     public function test_returning_to_checkout_restores_selection_and_ignores_invalid_query(): void
@@ -184,7 +193,7 @@ class PublicPurchaseFlowTest extends TestCase
             ->assertJsonPath('data.order_status', 'paid')
             ->assertJsonPath('data.payment_status', 'paid');
         $this->assertSame(2, $order->tickets()->whereNotNull('attendee_id')->count());
-        Mail::assertQueued(EticketMail::class, 1);
+        Mail::assertSent(EticketMail::class, 1);
     }
 
     public function test_checkout_revalidates_quota_and_preserves_validation_errors(): void

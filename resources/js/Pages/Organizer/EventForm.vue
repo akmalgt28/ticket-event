@@ -10,7 +10,7 @@ const form = useForm({
     title: props.event?.title || '', description: props.event?.description || '', banner: null,
     start_at: props.event?.start_at || '', end_at: props.event?.end_at || '',
     location_name: props.event?.location_name || '', location_address: props.event?.location_address || '',
-    contact_email: props.event?.contact_email || '', contact_phone: props.event?.contact_phone || '',
+    organizer_name: props.event?.organizer_name || '', contact_email: props.event?.contact_email || '', contact_phone: props.event?.contact_phone || '',
 });
 
 function submit() {
@@ -34,6 +34,7 @@ function submit() {
         <div class="min-h-[calc(100vh-9rem)] bg-[#f4f7fb] px-4 py-8 sm:px-6 lg:px-8"><div class="mx-auto max-w-4xl"><form class="space-y-6 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8" @submit.prevent="submit">
             <div class="grid gap-6 sm:grid-cols-2">
                 <div class="sm:col-span-2"><InputLabel value="Judul event" /><input v-model="form.title" type="text" placeholder="Contoh: Konser Musik Akhir Tahun" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.title" /></div>
+                <div class="sm:col-span-2"><InputLabel value="Nama penyelenggara" /><input v-model="form.organizer_name" type="text" placeholder="Contoh: Arcee Event Organizer" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.organizer_name" /></div>
                 <div class="sm:col-span-2"><InputLabel value="Deskripsi" /><textarea v-model="form.description" rows="5" placeholder="Jelaskan acara, agenda, dan informasi penting untuk peserta..." class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.description" /></div><div class="sm:col-span-2"><InputLabel value="Banner event" /><input type="file" accept="image/jpeg,image/png,image/webp" title="Pilih banner JPG, PNG, atau WEBP" class="mt-1 block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" @input="form.banner = $event.target.files[0]" /><InputError class="mt-2" :message="form.errors.banner" /></div>
                 <div><InputLabel value="Mulai" /><input v-model="form.start_at" type="datetime-local" title="Pilih waktu mulai event" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.start_at" /></div>
                 <div><InputLabel value="Selesai" /><input v-model="form.end_at" type="datetime-local" title="Pilih waktu selesai event" class="mt-1 w-full rounded-xl border-slate-200 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]" /><InputError class="mt-2" :message="form.errors.end_at" /></div>

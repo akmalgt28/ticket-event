@@ -19,6 +19,7 @@ class EventFactory extends Factory
     {
         return [
             'title' => fake()->sentence(4),
+            'organizer_name' => fake()->company(),
             'slug' => fake()->unique()->slug(),
             'description' => fake()->paragraphs(3, true),
             'banner_path' => null,

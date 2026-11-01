@@ -28,7 +28,7 @@ class OrganizerEventController extends Controller
 
         return Inertia::render('Organizer/Events', [
             'events' => $events->through(fn (Event $event): array => [
-                'id' => $event->id, 'title' => $event->title, 'slug' => $event->slug,
+                'id' => $event->id, 'title' => $event->title, 'organizer_name' => $event->organizer_name, 'slug' => $event->slug,
                 'status' => $event->status?->value, 'start_at' => $event->start_at?->toISOString(),
                 'end_at' => $event->end_at?->toISOString(), 'location_name' => $event->location_name,
             ]),
@@ -48,7 +48,7 @@ class OrganizerEventController extends Controller
 
         return Inertia::render('Organizer/EventForm', [
             'event' => [
-                'id' => $event->id, 'title' => $event->title, 'description' => $event->description,
+                'id' => $event->id, 'title' => $event->title, 'organizer_name' => $event->organizer_name, 'description' => $event->description,
                 'start_at' => $event->start_at?->format('Y-m-d\TH:i'), 'end_at' => $event->end_at?->format('Y-m-d\TH:i'),
                 'location_name' => $event->location_name, 'location_address' => $event->location_address,
                 'contact_email' => $event->contact_email, 'contact_phone' => $event->contact_phone,

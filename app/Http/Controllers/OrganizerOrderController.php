@@ -19,6 +19,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class OrganizerOrderController extends Controller
 {
@@ -125,7 +126,7 @@ class OrganizerOrderController extends Controller
             ]);
         }
 
-        $order->load(['event', 'tickets.attendee']);
+        $order->load(['event', 'tickets.attendee', 'tickets.orderItem']);
 
         if ($order->tickets->isEmpty()) {
             throw ValidationException::withMessages([
@@ -150,15 +151,36 @@ class OrganizerOrderController extends Controller
             'queued_at' => now(),
         ]);
 
-        Mail::to($order->customer_email)->queue(
-            (new EticketMail(
-                $order->order_number,
-                $order->event->title,
-                $order->tickets,
-                $delivery->id,
-            ))->afterCommit(),
+        $mail = new EticketMail(
+            $order->order_number,
+            $order->event->title,
+            $order->customer_name,
+            $order->customer_email,
+            $order->customer_phone,
+            $order->tickets,
+            $delivery->id,
+            [
+                'date' => $order->event->start_at?->format('d M Y') ?? '-',
+                'time' => $order->event->start_at && $order->event->end_at
+                    ? $order->event->start_at->format('H:i').' - '.$order->event->end_at->format('H:i').' WIB'
+                    : ($order->event->start_at?->format('H:i').' WIB' ?? '-'),
+                'location_name' => $order->event->location_name ?? '-',
+                'location_address' => $order->event->location_address,
+                'organizer_name' => $order->event->organizer_name ?? 'Penyelenggara Event',
+            ],
         );
 
-        return back()->with('success', "E-ticket order {$order->order_number} masuk antrean pengiriman.");
+        try {
+            Mail::mailer('resend')->to($order->customer_email)->sendNow($mail);
+        } catch (Throwable $exception) {
+            $mail->failed($exception);
+            report($exception);
+
+            return back()->withErrors([
+                'order' => 'E-ticket gagal dikirim. Coba lagi setelah memastikan layanan email tersedia.',
+            ]);
+        }
+
+        return back()->with('success', "E-ticket order {$order->order_number} berhasil dikirim.");
     }
 }

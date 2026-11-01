@@ -9,6 +9,7 @@ use App\Http\Controllers\OrganizerEventController;
 use App\Http\Controllers\OrganizerOrderController;
 use App\Http\Controllers\OrganizerParticipantController;
 use App\Http\Controllers\OrganizerTicketTypeController;
+use App\Http\Controllers\OrganizerUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicEventPageController;
 use App\Http\Controllers\PublicOrderStatusPageController;
@@ -41,6 +42,8 @@ Route::middleware(['auth', 'verified'])->prefix('organizer')->name('organizer.')
     Route::post('/orders/{order}/resend-eticket', [OrganizerOrderController::class, 'resendEticket'])->name('orders.resend-eticket');
     Route::get('/participants/export', [OrganizerParticipantController::class, 'export'])->name('participants.export');
     Route::get('/participants', [OrganizerParticipantController::class, 'index'])->name('participants.index');
+    Route::get('/users', [OrganizerUserController::class, 'index'])->middleware('can:users.manage')->name('users.index');
+    Route::post('/users', [OrganizerUserController::class, 'store'])->middleware('can:users.manage')->name('users.store');
     Route::get('/check-ins', [OrganizerCheckInController::class, 'index'])->name('check-ins.index');
 });
 Route::middleware(['auth', 'verified'])->prefix('organizer/events')->name('organizer.events.')->group(function () {

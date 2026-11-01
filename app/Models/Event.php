@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'title',
+    'organizer_name',
     'slug',
     'description',
     'banner_path',

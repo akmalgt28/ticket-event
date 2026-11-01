@@ -32,7 +32,7 @@ class EmailDeliveryTest extends TestCase
             'queued_at' => now(),
         ]);
 
-        (new EticketMail($order->order_number, 'Event', collect(), $delivery->id))
+        (new EticketMail($order->order_number, 'Event', $order->customer_name, $order->customer_email, $order->customer_phone, collect(), $delivery->id))
             ->failed(new RuntimeException('SMTP unavailable'));
 
         $this->assertDatabaseHas('email_deliveries', [
@@ -84,7 +84,7 @@ class EmailDeliveryTest extends TestCase
             'queued_at' => now(),
         ]);
 
-        $mail = new EticketMail($order->order_number, 'Event', collect(), $delivery->id);
+        $mail = new EticketMail($order->order_number, 'Event', $order->customer_name, $order->customer_email, $order->customer_phone, collect(), $delivery->id);
         $attachments = $mail->attachments();
         $pdf = null;
         $attachments[0]->attachWith(
@@ -99,5 +99,21 @@ class EmailDeliveryTest extends TestCase
         $this->assertCount(1, $attachments);
         $this->assertIsString($pdf);
         $this->assertStringStartsWith('%PDF-', $pdf);
+    }
+
+    public function test_eticket_mail_uses_resend_mailer(): void
+    {
+        $order = Order::factory()->create();
+        $delivery = EmailDelivery::query()->create([
+            'order_id' => $order->id,
+            'recipient' => $order->customer_email,
+            'type' => 'eticket',
+            'status' => 'queued',
+            'queued_at' => now(),
+        ]);
+
+        $mail = new EticketMail($order->order_number, 'Event', $order->customer_name, $order->customer_email, $order->customer_phone, collect(), $delivery->id);
+
+        $this->assertTrue($mail->usesMailer('resend'));
     }
 }

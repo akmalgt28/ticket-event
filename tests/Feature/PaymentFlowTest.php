@@ -122,7 +122,7 @@ class PaymentFlowTest extends TestCase
             'user_id' => $admin->id,
             'action' => 'payment.manual_verified',
         ]);
-        Mail::assertQueued(EticketMail::class, function (EticketMail $mail) use ($order): bool {
+        Mail::assertSent(EticketMail::class, function (EticketMail $mail) use ($order): bool {
             return $mail->orderNumber === $order->order_number;
         });
         $this->assertDatabaseHas('email_deliveries', [
@@ -150,6 +150,7 @@ class PaymentFlowTest extends TestCase
 
     public function test_repeated_manual_payment_verification_is_idempotent(): void
     {
+        Mail::fake();
         $this->seed();
         $admin = User::factory()->create();
         $admin->assignRole('admin');

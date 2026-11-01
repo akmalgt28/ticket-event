@@ -4,8 +4,6 @@ namespace App\Mail;
 
 use App\Models\EmailDelivery;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -15,28 +13,44 @@ use Illuminate\Support\Collection;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Throwable;
 
-class EticketMail extends Mailable implements ShouldQueue
+class EticketMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
-    public int $tries = 3;
-
-    public array $backoff = [60, 300, 900];
-
-    /** @var array<int, array{ticket_number: string, attendee_name: string, qr_svg: string}> */
+    /** @var array<int, array{ticket_number: string, attendee_name: string, ticket_type_name: string, ticket_price: string, qr_svg: string, qr_data_uri: string}> */
     public array $ticketData;
+
+    /** @var array{date: string, time: string, location_name: string, location_address: ?string, organizer_name: string} */
+    public array $eventDetails;
 
     public function __construct(
         public string $orderNumber,
         public string $eventTitle,
+        public string $customerName,
+        public string $customerEmail,
+        public string $customerPhone,
         Collection $tickets,
         public int $deliveryId,
+        array $eventDetails = [],
     ) {
+        $this->mailer('resend');
+        $this->eventDetails = array_merge([
+            'date' => '-',
+            'time' => '-',
+            'location_name' => '-',
+            'location_address' => null,
+            'organizer_name' => 'Penyelenggara Event',
+        ], $eventDetails);
         $this->ticketData = $tickets->map(function ($ticket): array {
+            $qrSvg = (string) QrCode::format('svg')->size(220)->margin(1)->generate($ticket->qr_token);
+
             return [
                 'ticket_number' => $ticket->ticket_number,
                 'attendee_name' => $ticket->attendee?->name ?? 'Peserta',
-                'qr_svg' => (string) QrCode::format('svg')->size(220)->margin(1)->generate($ticket->qr_token),
+                'ticket_type_name' => $ticket->orderItem?->ticket_name_snapshot ?? 'Tiket',
+                'ticket_price' => (string) ($ticket->orderItem?->unit_price ?? '0'),
+                'qr_svg' => $qrSvg,
+                'qr_data_uri' => 'data:image/svg+xml;base64,'.base64_encode($qrSvg),
             ];
         })->values()->all();
     }
@@ -57,7 +71,8 @@ class EticketMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.eticket',
+            view: 'emails.eticket-html',
+            text: 'emails.eticket-text',
         );
     }
 
@@ -68,7 +83,11 @@ class EticketMail extends Mailable implements ShouldQueue
                 fn (): string => Pdf::loadView('emails.eticket-pdf', [
                     'orderNumber' => $this->orderNumber,
                     'eventTitle' => $this->eventTitle,
+                    'customerName' => $this->customerName,
+                    'customerEmail' => $this->customerEmail,
+                    'customerPhone' => $this->customerPhone,
                     'ticketData' => $this->ticketData,
+                    'eventDetails' => $this->eventDetails,
                 ])->setPaper('a4')->output(),
                 "e-ticket-{$this->orderNumber}.pdf",
             )->withMime('application/pdf'),

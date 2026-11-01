@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import AdminIcon from '@/Components/AdminIcon.vue';
 
 const showingNavigationDropdown = ref(false);
+const page = usePage();
 
 const navigationGroups = [
     {
@@ -19,11 +20,16 @@ const navigationGroups = [
         items: [
             { label: 'Events', href: 'organizer.events.index', icon: 'calendar', match: 'organizer.events.*' },
             { label: 'Peserta', href: 'organizer.participants.index', icon: 'users', match: 'organizer.participants.*' },
+            { label: 'Pengguna', href: 'organizer.users.index', icon: 'user-plus', match: 'organizer.users.*', adminOnly: true },
             { label: 'Scanner', href: 'check-in.index', icon: 'scan', match: 'check-in.index' },
             { label: 'Riwayat check-in', href: 'organizer.check-ins.index', icon: 'receipt', match: 'organizer.check-ins.*' },
         ],
     },
 ];
+
+function visibleItems(group) {
+    return group.items.filter((item) => !item.adminOnly || page.props.auth?.user?.can_manage_users);
+}
 
 function isActive(item) {
     const isPaymentQueue = route().current('organizer.orders.index')
@@ -62,7 +68,7 @@ function closeMobileMenu() {
                 <div v-for="group in navigationGroups" :key="group.label" class="mb-7 last:mb-0">
                     <p class="mb-2 px-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{{ group.label }}</p>
                     <div class="space-y-1">
-                        <Link v-for="item in group.items" :key="item.href" :href="route(item.href)" :class="isActive(item) ? 'bg-[var(--brand-primary)] font-bold text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[var(--brand-primary)]'" class="flex items-center gap-3 rounded-md border-l-2 border-transparent px-3 py-3 text-sm transition" :aria-current="isActive(item) ? 'page' : undefined" @click="closeMobileMenu">
+                        <Link v-for="item in visibleItems(group)" :key="item.href" :href="route(item.href)" :class="isActive(item) ? 'bg-[var(--brand-primary)] font-bold text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[var(--brand-primary)]'" class="flex items-center gap-3 rounded-md border-l-2 border-transparent px-3 py-3 text-sm transition" :aria-current="isActive(item) ? 'page' : undefined" @click="closeMobileMenu">
                             <AdminIcon :name="item.icon" class="h-[18px] w-[18px] shrink-0" />
                             <span>{{ item.label }}</span>
                         </Link>

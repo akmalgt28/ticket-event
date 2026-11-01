@@ -64,6 +64,35 @@ class OrganizerEventEndpointTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_organizer_name_is_saved_and_empty_submitted_names_are_rejected(): void
+    {
+        $this->seed();
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+        $payload = [
+            'title' => 'Event Dengan Penyelenggara',
+            'organizer_name' => 'Organizer Resmi',
+            'description' => 'Deskripsi event.',
+            'start_at' => '2026-12-01 09:00:00',
+            'end_at' => '2026-12-01 17:00:00',
+            'location_name' => 'Main Hall',
+            'location_address' => 'Jakarta',
+        ];
+
+        $response = $this->actingAs($admin)->postJson('/organizer/events', $payload)
+            ->assertCreated()->assertJsonPath('data.organizer_name', 'Organizer Resmi');
+        $event = Event::query()->findOrFail($response->json('data.id'));
+
+        $this->actingAs($admin)->get('/organizer/events/'.$event->id.'/edit')->assertOk()
+            ->assertInertia(fn ($page) => $page->where('event.organizer_name', 'Organizer Resmi'));
+        $this->actingAs($admin)->postJson('/organizer/events', [...$payload, 'organizer_name' => ''])
+            ->assertUnprocessable()->assertJsonValidationErrors('organizer_name');
+
+        unset($payload['organizer_name']);
+        $this->actingAs($admin)->patchJson('/organizer/events/'.$event->id, $payload)
+            ->assertOk()->assertJsonPath('data.organizer_name', 'Organizer Resmi');
+    }
+
     public function test_admin_can_open_events_inertia_page(): void
     {
         $this->seed();

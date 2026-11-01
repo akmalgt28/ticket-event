@@ -109,7 +109,8 @@ class PaymentService
      */
     public function verifyManual(Order $order, array $data, User $user): Payment
     {
-        return DB::transaction(function () use ($order, $data, $user): Payment {
+        $eticketDelivery = null;
+        $payment = DB::transaction(function () use ($order, $data, $user, &$eticketDelivery): Payment {
             $lockedOrder = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
             $payment = $lockedOrder->payments()->latest('id')->lockForUpdate()->first();
 
@@ -170,7 +171,7 @@ class PaymentService
             if ($targetStatus === PaymentStatus::Paid) {
                 $issued = $this->ticketIssuance->issue($lockedOrder);
                 $lockedOrder->load('event');
-                $issued['tickets']->each(fn ($ticket) => $ticket->load('attendee'));
+                $issued['tickets']->each(fn ($ticket) => $ticket->load(['attendee', 'orderItem']));
 
                 $delivery = $lockedOrder->emailDeliveries()->create([
                     'recipient' => $lockedOrder->customer_email,
@@ -179,14 +180,25 @@ class PaymentService
                     'queued_at' => now(),
                 ]);
 
-                Mail::to($lockedOrder->customer_email)->queue(
-                    (new EticketMail(
-                        $lockedOrder->order_number,
-                        $lockedOrder->event->title,
-                        $issued['tickets'],
-                        $delivery->id,
-                    ))->afterCommit(),
-                );
+                $eticketDelivery = [
+                    'recipient' => $lockedOrder->customer_email,
+                    'order_number' => $lockedOrder->order_number,
+                    'event_title' => $lockedOrder->event->title,
+                    'customer_name' => $lockedOrder->customer_name,
+                    'customer_email' => $lockedOrder->customer_email,
+                    'customer_phone' => $lockedOrder->customer_phone,
+                    'tickets' => $issued['tickets'],
+                    'delivery_id' => $delivery->id,
+                    'event_details' => [
+                        'date' => $lockedOrder->event->start_at?->format('d M Y') ?? '-',
+                        'time' => $lockedOrder->event->start_at && $lockedOrder->event->end_at
+                            ? $lockedOrder->event->start_at->format('H:i').' - '.$lockedOrder->event->end_at->format('H:i').' WIB'
+                            : ($lockedOrder->event->start_at?->format('H:i').' WIB' ?? '-'),
+                        'location_name' => $lockedOrder->event->location_name ?? '-',
+                        'location_address' => $lockedOrder->event->location_address,
+                        'organizer_name' => $lockedOrder->event->organizer_name ?? 'Penyelenggara Event',
+                    ],
+                ];
             }
 
             $this->auditLogs->record(
@@ -203,5 +215,31 @@ class PaymentService
 
             return $payment->fresh();
         });
+
+        if ($eticketDelivery !== null) {
+            $mail = new EticketMail(
+                $eticketDelivery['order_number'],
+                $eticketDelivery['event_title'],
+                $eticketDelivery['customer_name'],
+                $eticketDelivery['customer_email'],
+                $eticketDelivery['customer_phone'],
+                $eticketDelivery['tickets'],
+                $eticketDelivery['delivery_id'],
+                $eticketDelivery['event_details'],
+            );
+
+            try {
+                Mail::mailer('resend')->to($eticketDelivery['recipient'])->sendNow($mail);
+            } catch (Throwable $exception) {
+                $mail->failed($exception);
+                report($exception);
+
+                throw ValidationException::withMessages([
+                    'email' => 'Pembayaran berhasil, tetapi e-ticket gagal dikirim. Gunakan tombol kirim ulang.',
+                ]);
+            }
+        }
+
+        return $payment;
     }
 }
